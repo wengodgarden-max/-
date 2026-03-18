@@ -13,6 +13,7 @@ from langchain_core.messages import AnyMessage
 from coze_coding_utils.runtime_ctx.context import default_headers
 from storage.memory.memory_saver import get_memory_saver
 from tools.document_parser import parse_document  # 导入文档解析工具
+from tools.web_search_tool import web_search, get_industry_benchmark  # 导入搜索工具
 
 LLM_CONFIG = "config/agent_llm_config.json"
 
@@ -70,6 +71,13 @@ def build_agent(ctx=None):
     # 根据配置添加工具
     if "parse_document" in tools_config:
         tools.append(parse_document)
+    
+    # 添加搜索工具
+    if "web_search" in tools_config:
+        tools.append(web_search)
+    
+    if "get_industry_benchmark" in tools_config:
+        tools.append(get_industry_benchmark)
 
     return create_agent(
         model=llm,
