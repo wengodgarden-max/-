@@ -555,6 +555,200 @@ async def health_check():
         raise HTTPException(status_code=503, detail=str(e))
 
 
+# ============ 运营数据统计API ============
+from datetime import datetime, timedelta
+from collections import defaultdict
+import threading
+
+# 内存存储统计数据（生产环境应使用数据库）
+_stats_lock = threading.Lock()
+_stats_data = {
+    "total_visits": 0,
+    "today_visits": 0,
+    "week_visits": 0,
+    "total_users": set(),
+    "today_users": set(),
+    "returning_users": set(),
+    "total_outputs": 0,
+    "today_outputs": 0,
+    "total_rewards": 0,
+    "today_rewards": 0,
+    "funnel_start": 0,
+    "funnel_topic": 0,
+    "funnel_rules": 0,
+    "funnel_output": 0,
+    "hot_topics": defaultdict(int),
+    "last_reset_date": datetime.now().date().isoformat()
+}
+
+def _reset_daily_stats():
+    """每日重置统计"""
+    global _stats_data
+    with _stats_lock:
+        today = datetime.now().date().isoformat()
+        if _stats_data["last_reset_date"] != today:
+            _stats_data["today_visits"] = 0
+            _stats_data["today_users"] = set()
+            _stats_data["today_outputs"] = 0
+            _stats_data["today_rewards"] = 0
+            _stats_data["last_reset_date"] = today
+
+@app.post("/api/stats/visit")
+async def track_visit(request: Request):
+    """记录访问"""
+    try:
+        _reset_daily_stats()
+        payload = await request.json()
+        session_id = payload.get("sessionId", "unknown")
+        
+        with _stats_lock:
+            _stats_data["total_visits"] += 1
+            _stats_data["today_visits"] += 1
+            _stats_data["week_visits"] += 1
+            
+            # 用户统计
+            if session_id not in _stats_data["total_users"]:
+                _stats_data["total_users"].add(session_id)
+            else:
+                _stats_data["returning_users"].add(session_id)
+            
+            _stats_data["today_users"].add(session_id)
+        
+        return {"status": "success"}
+    except Exception as e:
+        logger.error(f"Error tracking visit: {e}")
+        return {"status": "error"}
+
+@app.post("/api/stats/complete")
+async def track_complete(request: Request):
+    """记录完成产出"""
+    try:
+        _reset_daily_stats()
+        payload = await request.json()
+        session_id = payload.get("sessionId", "unknown")
+        mode = payload.get("mode", "quick")
+        
+        with _stats_lock:
+            _stats_data["total_outputs"] += 1
+            _stats_data["today_outputs"] += 1
+            _stats_data["funnel_output"] += 1
+        
+        return {"status": "success"}
+    except Exception as e:
+        logger.error(f"Error tracking complete: {e}")
+        return {"status": "error"}
+
+@app.post("/api/stats/reward")
+async def track_reward(request: Request):
+    """记录打赏开通"""
+    try:
+        _reset_daily_stats()
+        payload = await request.json()
+        
+        with _stats_lock:
+            _stats_data["total_rewards"] += 1
+            _stats_data["today_rewards"] += 1
+        
+        return {"status": "success"}
+    except Exception as e:
+        logger.error(f"Error tracking reward: {e}")
+        return {"status": "error"}
+
+@app.get("/api/stats/data")
+async def get_stats_data():
+    """获取统计数据"""
+    try:
+        _reset_daily_stats()
+        
+        with _stats_lock:
+            data = {
+                "totalVisits": _stats_data["total_visits"],
+                "todayVisits": _stats_data["today_visits"],
+                "weekVisits": _stats_data["week_visits"],
+                "totalUsers": len(_stats_data["total_users"]),
+                "todayUsers": len(_stats_data["today_users"]),
+                "returningUsers": len(_stats_data["returning_users"]),
+                "totalOutputs": _stats_data["total_outputs"],
+                "todayOutputs": _stats_data["today_outputs"],
+                "rewardRate": round(_stats_data["total_rewards"] / max(_stats_data["total_outputs"], 1) * 100, 1),
+                "completeRate": round(_stats_data["funnel_output"] / max(_stats_data["total_visits"], 1) * 100, 1),
+                "funnelStart": _stats_data["funnel_start"],
+                "funnelTopic": _stats_data["funnel_topic"],
+                "funnelRules": _stats_data["funnel_rules"],
+                "funnelOutput": _stats_data["funnel_output"],
+            }
+        
+        return data
+    except Exception as e:
+        logger.error(f"Error getting stats data: {e}")
+        return {"error": str(e)}
+
+@app.post("/alchemist/upload")
+async def upload_file(request: Request):
+    """文件上传处理"""
+    try:
+        form = await request.form()
+        file = form.get("file")
+        session_id = form.get("session_id", "default")
+        
+        if not file:
+            raise HTTPException(status_code=400, detail="没有上传文件")
+        
+        # 读取文件内容
+        content = await file.read()
+        filename = file.filename
+        file_type = file.content_type
+        
+        logger.info(f"File uploaded: {filename}, type: {file_type}, size: {len(content)}")
+        
+        # 更新漏斗统计
+        with _stats_lock:
+            _stats_data["funnel_start"] += 1
+        
+        # 返回处理结果
+        return {
+            "status": "success",
+            "message": f"""📎 我已收到您的文件 **{filename}**
+
+让我来帮您分析一下其中的亮点：
+
+**请您再补充1-2个您最自豪的项目或成就**（包括背景、您的角色、数据结果），这样我可以更全面地了解您的专业领域。
+
+或者，您可以直接告诉我：
+- 您在工作中最常被请教哪类问题？
+- 有什么是您一眼就能看穿、别人却觉得复杂的问题？"""
+        }
+    except Exception as e:
+        logger.error(f"Error uploading file: {e}")
+        return {"status": "error", "message": "文件处理失败，请重试"}
+
+@app.post("/alchemist/reward")
+async def upload_reward_qr(request: Request):
+    """上传收款二维码"""
+    try:
+        form = await request.form()
+        file = form.get("qr_code")
+        session_id = form.get("session_id", "default")
+        
+        if not file:
+            raise HTTPException(status_code=400, detail="没有上传文件")
+        
+        # 读取文件
+        content = await file.read()
+        
+        logger.info(f"Reward QR uploaded: session={session_id}, size={len(content)}")
+        
+        # 更新打赏统计
+        with _stats_lock:
+            _stats_data["total_rewards"] += 1
+            _stats_data["today_rewards"] += 1
+        
+        return {"status": "success", "message": "收款码上传成功"}
+    except Exception as e:
+        logger.error(f"Error uploading reward QR: {e}")
+        return {"status": "error", "message": "上传失败"}
+
+
 @app.get(path="/graph_parameter")
 async def http_graph_inout_parameter(request: Request):
     return service.graph_inout_schema()

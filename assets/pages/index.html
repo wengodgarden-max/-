@@ -11,32 +11,262 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --bg-light: #f8f9fa;
+            --text-dark: #333;
+            --text-gray: #666;
+            --text-light: #999;
+            --border-color: #e0e0e0;
+        }
+
         body {
             font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
         }
 
-        .container {
+        /* 整体布局 */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        /* 左侧运营数据栏 */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 100;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .stats-section {
+            margin-bottom: 20px;
+        }
+
+        .stats-section-title {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .stat-card-icon {
+            font-size: 24px;
+        }
+
+        .stat-card-trend {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .stat-card-trend.up {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-card-trend.down {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--danger-color);
+        }
+
+        .stat-card-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .stat-card-label {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .stat-card-sub {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-card-sub-item {
+            flex: 1;
+        }
+
+        .stat-card-sub-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .stat-card-sub-label {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo-icon {
+            font-size: 28px;
+        }
+
+        .nav-logo-text {
+            font-size: 18px;
+            font-weight: bold;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            margin-left: 30px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            color: var(--text-gray);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-light);
+        }
+
+        .nav-tab.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        /* 内容容器 */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 炼金主页 */
+        .alchemist-page {
             width: 100%;
             max-width: 800px;
-            height: 95vh;
-            height: 95dvh;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            max-height: calc(100vh - 140px);
+            max-height: calc(100dvh - 140px);
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .page-header {
+            background: var(--primary-gradient);
             color: white;
             padding: 15px 20px;
             display: flex;
@@ -45,16 +275,16 @@
             flex-shrink: 0;
         }
 
-        .header-icon {
+        .page-header-icon {
             font-size: 32px;
         }
 
-        .header-text h1 {
+        .page-header-text h1 {
             font-size: 20px;
             margin-bottom: 3px;
         }
 
-        .header-text p {
+        .page-header-text p {
             font-size: 12px;
             opacity: 0.9;
         }
@@ -63,8 +293,8 @@
             display: flex;
             justify-content: space-between;
             padding: 15px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
         }
 
@@ -79,8 +309,8 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: #e0e0e0;
-            color: #999;
+            background: var(--border-color);
+            color: var(--text-light);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -91,18 +321,18 @@
         }
 
         .progress-circle.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
         }
 
         .progress-circle.completed {
-            background: #4caf50;
+            background: var(--success-color);
             color: white;
         }
 
         .progress-label {
             font-size: 10px;
-            color: #999;
+            color: var(--text-light);
             text-align: center;
         }
 
@@ -124,14 +354,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.user {
@@ -151,11 +375,11 @@
         }
 
         .message.ai .avatar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
         }
 
         .message.user .avatar {
-            background: #e0e0e0;
+            background: var(--border-color);
         }
 
         .message-content {
@@ -167,11 +391,11 @@
 
         .message.ai .message-content {
             background: #f0f4ff;
-            color: #333;
+            color: var(--text-dark);
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
         }
 
@@ -184,44 +408,116 @@
             margin: 6px 0;
         }
 
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 12px 16px;
-            background: #f0f4ff;
+        /* Prompt输出框 */
+        .prompt-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .copy-btn:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+        }
+
+        /* 打赏区域 */
+        .reward-section {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff0f6 100%);
+            border: 2px dashed var(--danger-color);
             border-radius: 16px;
-            width: fit-content;
+            padding: 20px;
+            margin-top: 15px;
+            text-align: center;
         }
 
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: #667eea;
-            border-radius: 50%;
-            animation: typingBounce 1.4s infinite;
+        .reward-section h3 {
+            color: var(--danger-color);
+            margin-bottom: 15px;
+            font-size: 16px;
         }
 
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
+        .reward-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
+        .reward-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
         }
 
-        @keyframes typingBounce {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-6px);
-            }
+        .reward-btn.primary {
+            background: var(--danger-color);
+            color: white;
         }
 
+        .reward-btn.secondary {
+            background: white;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .reward-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+
+        .qr-upload {
+            margin-top: 15px;
+        }
+
+        .qr-upload input[type="file"] {
+            display: none;
+        }
+
+        .qr-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px auto;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .qr-preview.show {
+            display: block;
+        }
+
+        /* 输入区域 */
         .input-container {
             padding: 12px 15px;
             background: white;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -242,7 +538,7 @@
         #userInput {
             width: 100%;
             padding: 12px 16px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border-color);
             border-radius: 22px;
             font-size: 16px;
             font-family: inherit;
@@ -254,59 +550,20 @@
         }
 
         #userInput:focus {
-            border-color: #667eea;
+            border-color: var(--primary-color);
         }
 
         #userInput:disabled {
-            background: #f5f5f5;
+            background: var(--bg-light);
             cursor: not-allowed;
         }
 
-        .voice-btn {
+        .action-btn {
             width: 50px;
             height: 50px;
             border: none;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .voice-btn.recording {
-            background: #f44336;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-        }
-
-        .voice-btn:hover:not(:disabled) {
-            transform: scale(1.05);
-        }
-
-        .voice-btn:disabled {
-            background: #e0e0e0;
-            cursor: not-allowed;
-        }
-
-        .send-btn {
-            width: 50px;
-            height: 50px;
-            border: none;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
             font-size: 20px;
             cursor: pointer;
@@ -317,13 +574,23 @@
             flex-shrink: 0;
         }
 
-        .send-btn:hover:not(:disabled) {
+        .action-btn:hover:not(:disabled) {
             transform: scale(1.05);
         }
 
-        .send-btn:disabled {
-            background: #e0e0e0;
+        .action-btn:disabled {
+            background: var(--border-color);
             cursor: not-allowed;
+        }
+
+        .action-btn.recording {
+            background: var(--danger-color);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .mode-buttons {
@@ -336,10 +603,10 @@
 
         .mode-btn {
             padding: 12px 24px;
-            border: 2px solid #667eea;
+            border: 2px solid var(--primary-color);
             border-radius: 12px;
             background: white;
-            color: #667eea;
+            color: var(--primary-color);
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -350,7 +617,7 @@
         }
 
         .mode-btn:hover {
-            background: #667eea;
+            background: var(--primary-gradient);
             color: white;
             transform: translateY(-2px);
         }
@@ -362,34 +629,87 @@
         .voice-hint {
             text-align: center;
             font-size: 12px;
-            color: #999;
+            color: var(--text-light);
             padding: 5px;
         }
 
         .voice-hint.recording {
-            color: #f44336;
+            color: var(--danger-color);
             font-weight: bold;
         }
 
+        /* 文件上传提示 */
+        .file-upload-hint {
+            background: #e8f5e9;
+            border: 1px solid var(--success-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .file-upload-hint .file-name {
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        /* 响应式 */
+        @media (max-width: 900px) {
+            .sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-tabs {
+                display: none;
+            }
+
+            .alchemist-page {
+                max-height: calc(100vh - 100px);
+                max-height: calc(100dvh - 100px);
+            }
+        }
+
         @media (max-width: 600px) {
-            .container {
-                height: 100vh;
-                height: 100dvh;
+            .content-wrapper {
+                padding: 10px;
+            }
+
+            .alchemist-page {
+                height: calc(100vh - 80px);
+                height: calc(100dvh - 80px);
                 max-height: none;
                 border-radius: 0;
             }
-            
+
             .mode-buttons {
                 flex-direction: column;
             }
-            
+
             .mode-btn {
                 width: 100%;
                 justify-content: center;
             }
 
-            .header-text h1 {
+            .page-header-text h1 {
                 font-size: 18px;
+            }
+
+            .stat-card-value {
+                font-size: 22px;
             }
         }
 
@@ -399,66 +719,282 @@
                 padding-bottom: calc(12px + env(safe-area-inset-bottom));
             }
         }
+
+        /* 遮罩层 */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="header-icon">🔮</div>
-            <div class="header-text">
-                <h1>炼金坊</h1>
-                <p>把你的判断力变成付费AI工具</p>
+    <div class="app-container">
+        <!-- 左侧运营数据栏 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>📊 运营数据看板</h2>
+                <p>实时监控平台运营情况</p>
             </div>
-        </div>
+            <div class="sidebar-content">
+                <!-- 核心指标 -->
+                <div class="stats-section">
+                    <div class="stats-section-title">核心指标</div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-icon">👁️</span>
+                            <span class="stat-card-trend up">+12.5%</span>
+                        </div>
+                        <div class="stat-card-value" id="totalVisits">1,234</div>
+                        <div class="stat-card-label">总访问量</div>
+                        <div class="stat-card-sub">
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="todayVisits">89</div>
+                                <div class="stat-card-sub-label">今日访问</div>
+                            </div>
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="weekVisits">456</div>
+                                <div class="stat-card-sub-label">本周访问</div>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="progress-bar hidden" id="progressBar">
-            <div class="progress-step">
-                <div class="progress-circle active" id="step1">1</div>
-                <span class="progress-label">锁定选题</span>
-            </div>
-            <div class="progress-step">
-                <div class="progress-circle" id="step2">2</div>
-                <span class="progress-label">拆解决策</span>
-            </div>
-            <div class="progress-step">
-                <div class="progress-circle" id="step3">3</div>
-                <span class="progress-label">结构化</span>
-            </div>
-            <div class="progress-step">
-                <div class="progress-circle" id="step4">4</div>
-                <span class="progress-label">封装工具</span>
-            </div>
-        </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-icon">👥</span>
+                            <span class="stat-card-trend up">+8.3%</span>
+                        </div>
+                        <div class="stat-card-value" id="totalUsers">567</div>
+                        <div class="stat-card-label">访问人数</div>
+                        <div class="stat-card-sub">
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="todayUsers">23</div>
+                                <div class="stat-card-sub-label">今日新增</div>
+                            </div>
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="returningUsers">189</div>
+                                <div class="stat-card-sub-label">回访用户</div>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- 聊天界面 -->
-        <div id="chatContainer" class="chat-container"></div>
-
-        <!-- 输入区域 -->
-        <div id="inputContainer" class="input-container hidden">
-            <div class="voice-hint" id="voiceHint">按住语音按钮说话，松开发送</div>
-            <div class="input-row">
-                <button class="voice-btn" id="voiceBtn" ontouchstart="startRecording(event)" ontouchend="stopRecording(event)" onmousedown="startRecording(event)" onmouseup="stopRecording(event)">
-                    🎤
-                </button>
-                <div class="input-wrapper">
-                    <input type="text" id="userInput" placeholder="输入或语音输入..." autocomplete="off" />
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-icon">🤖</span>
+                            <span class="stat-card-trend up">+15.2%</span>
+                        </div>
+                        <div class="stat-card-value" id="totalOutputs">89</div>
+                        <div class="stat-card-label">产出工具数</div>
+                        <div class="stat-card-sub">
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="todayOutputs">5</div>
+                                <div class="stat-card-sub-label">今日产出</div>
+                            </div>
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="avgRules">4.2</div>
+                                <div class="stat-card-sub-label">平均规则数</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                    ➤
-                </button>
+
+                <!-- 转化漏斗 -->
+                <div class="stats-section">
+                    <div class="stats-section-title">转化漏斗</div>
+                    <div class="stat-card">
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-size: 13px; color: var(--text-gray);">开始炼金</span>
+                                <span style="font-size: 13px; font-weight: bold;" id="funnelStart">456</span>
+                            </div>
+                            <div style="height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden;">
+                                <div style="width: 100%; height: 100%; background: var(--primary-gradient);"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-size: 13px; color: var(--text-gray);">完成选题</span>
+                                <span style="font-size: 13px; font-weight: bold;" id="funnelTopic">234</span>
+                            </div>
+                            <div style="height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden;">
+                                <div style="width: 51%; height: 100%; background: var(--success-color);"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-size: 13px; color: var(--text-gray);">完成规则</span>
+                                <span style="font-size: 13px; font-weight: bold;" id="funnelRules">156</span>
+                            </div>
+                            <div style="height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden;">
+                                <div style="width: 34%; height: 100%; background: var(--warning-color);"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-size: 13px; color: var(--text-gray);">产出工具</span>
+                                <span style="font-size: 13px; font-weight: bold;" id="funnelOutput">89</span>
+                            </div>
+                            <div style="height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden;">
+                                <div style="width: 19%; height: 100%; background: var(--danger-color);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 商业化指标 -->
+                <div class="stats-section">
+                    <div class="stats-section-title">商业化指标</div>
+                    <div class="stat-card">
+                        <div class="stat-card-sub" style="border: none; padding-top: 0;">
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="rewardRate">32%</div>
+                                <div class="stat-card-sub-label">打赏开通率</div>
+                            </div>
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="shareRate">18%</div>
+                                <div class="stat-card-sub-label">分享率</div>
+                            </div>
+                        </div>
+                        <div class="stat-card-sub">
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="avgTime">12.5</div>
+                                <div class="stat-card-sub-label">平均用时(分钟)</div>
+                            </div>
+                            <div class="stat-card-sub-item">
+                                <div class="stat-card-sub-value" id="completeRate">19.5%</div>
+                                <div class="stat-card-sub-label">完成率</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 热门选题 -->
+                <div class="stats-section">
+                    <div class="stats-section-title">🔥 热门选题 TOP5</div>
+                    <div class="stat-card" style="font-size: 13px;">
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>1. 渠道投放评估</span>
+                            <span style="color: var(--primary-color);">23次</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>2. 简历筛选判断</span>
+                            <span style="color: var(--primary-color);">18次</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>3. 投资机会判断</span>
+                            <span style="color: var(--primary-color);">15次</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>4. 需求优先级评估</span>
+                            <span style="color: var(--primary-color);">12次</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                            <span>5. 故障根因诊断</span>
+                            <span style="color: var(--primary-color);">10次</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </aside>
+
+        <!-- 遮罩层 -->
+        <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航 -->
+            <nav class="top-nav">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <div class="nav-logo">
+                    <span class="nav-logo-icon">🔮</span>
+                    <span class="nav-logo-text">炼金坊</span>
+                </div>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchPage('home')">🏠 炼金主页</button>
+                    <button class="nav-tab" onclick="switchPage('data')">📊 数据看板</button>
+                </div>
+            </nav>
+
+            <!-- 内容区 -->
+            <div class="content-wrapper">
+                <!-- 炼金主页 -->
+                <div class="alchemist-page" id="alchemistPage">
+                    <div class="page-header">
+                        <div class="page-header-icon">🧪</div>
+                        <div class="page-header-text">
+                            <h1>决策炼金工坊</h1>
+                            <p>把你的判断力变成付费AI工具</p>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar hidden" id="progressBar">
+                        <div class="progress-step">
+                            <div class="progress-circle active" id="step1">1</div>
+                            <span class="progress-label">锁定选题</span>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-circle" id="step2">2</div>
+                            <span class="progress-label">拆解决策</span>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-circle" id="step3">3</div>
+                            <span class="progress-label">结构化</span>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-circle" id="step4">4</div>
+                            <span class="progress-label">封装工具</span>
+                        </div>
+                    </div>
+
+                    <!-- 聊天界面 -->
+                    <div id="chatContainer" class="chat-container"></div>
+
+                    <!-- 输入区域 -->
+                    <div id="inputContainer" class="input-container hidden">
+                        <div class="voice-hint" id="voiceHint">按住麦克风说话，松开发送 | 点击📎上传附件</div>
+                        <div class="input-row">
+                            <button class="action-btn" id="voiceBtn" ontouchstart="startRecording(event)" ontouchend="stopRecording(event)" onmousedown="startRecording(event)" onmouseup="stopRecording(event)">
+                                🎤
+                            </button>
+                            <label class="action-btn" id="uploadBtn" style="cursor: pointer;">
+                                📎
+                                <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,.md" style="display: none;" onchange="handleFileUpload(event)">
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" id="userInput" placeholder="输入或语音输入..." autocomplete="off" />
+                            </div>
+                            <button class="action-btn" id="sendBtn" onclick="sendMessage()">
+                                ➤
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
+        // 会话数据
         let sessionData = {
-            sessionId: 'session_' + Date.now(),
+            sessionId: 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
             currentLevel: 0,
             mode: null,
-            messages: []
+            messages: [],
+            uploadedFile: null,
+            completed: false,
+            showReward: false
         };
 
-        // 获取当前页面的主机地址
+        // API地址
         const API_BASE = window.location.origin;
 
         // 语音识别相关
@@ -466,11 +1002,75 @@
         let isRecording = false;
         let finalTranscript = '';
 
-        // 页面加载后，AI先打招呼
+        // 页面加载
         window.onload = function() {
             initSpeechRecognition();
             showWelcomeMessage();
+            loadStatsData();
+            trackVisit();
         };
+
+        // 访问统计
+        function trackVisit() {
+            fetch(`${API_BASE}/api/stats/visit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    sessionId: sessionData.sessionId,
+                    referrer: document.referrer,
+                    userAgent: navigator.userAgent
+                })
+            }).catch(() => {});
+        }
+
+        // 加载统计数据
+        async function loadStatsData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/stats/data`);
+                const data = await response.json();
+                updateStatsUI(data);
+            } catch (e) {
+                // 使用模拟数据
+                console.log('Using default stats data');
+            }
+        }
+
+        // 更新统计UI
+        function updateStatsUI(data) {
+            if (data.totalVisits) document.getElementById('totalVisits').textContent = formatNumber(data.totalVisits);
+            if (data.todayVisits) document.getElementById('todayVisits').textContent = formatNumber(data.todayVisits);
+            if (data.weekVisits) document.getElementById('weekVisits').textContent = formatNumber(data.weekVisits);
+            if (data.totalUsers) document.getElementById('totalUsers').textContent = formatNumber(data.totalUsers);
+            if (data.todayUsers) document.getElementById('todayUsers').textContent = formatNumber(data.todayUsers);
+            if (data.returningUsers) document.getElementById('returningUsers').textContent = formatNumber(data.returningUsers);
+            if (data.totalOutputs) document.getElementById('totalOutputs').textContent = formatNumber(data.totalOutputs);
+            if (data.todayOutputs) document.getElementById('todayOutputs').textContent = formatNumber(data.todayOutputs);
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toString();
+        }
+
+        // 切换侧边栏
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+
+        // 切换页面
+        function switchPage(page) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (page === 'data') {
+                toggleSidebar();
+            }
+        }
 
         // 初始化语音识别
         function initSpeechRecognition() {
@@ -483,7 +1083,7 @@
                 recognition.onstart = function() {
                     isRecording = true;
                     document.getElementById('voiceBtn').classList.add('recording');
-                    document.getElementById('voiceHint').textContent = '正在聆听...';
+                    document.getElementById('voiceHint').textContent = '🎙️ 正在聆听...';
                     document.getElementById('voiceHint').classList.add('recording');
                 };
 
@@ -503,10 +1103,9 @@
                 recognition.onend = function() {
                     isRecording = false;
                     document.getElementById('voiceBtn').classList.remove('recording');
-                    document.getElementById('voiceHint').textContent = '按住语音按钮说话，松开发送';
+                    document.getElementById('voiceHint').textContent = '按住麦克风说话，松开发送 | 点击📎上传附件';
                     document.getElementById('voiceHint').classList.remove('recording');
                     
-                    // 如果有内容，自动发送
                     if (finalTranscript.trim()) {
                         sendMessage();
                         finalTranscript = '';
@@ -542,6 +1141,80 @@
             }
         }
 
+        // 文件上传处理
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'text/markdown'];
+            if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|doc|docx|txt|md)$/i)) {
+                addMessage('⚠️ 暂不支持该文件格式，请上传 PDF、Word、TXT 或 Markdown 文件。', false);
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                addMessage('⚠️ 文件大小不能超过 10MB', false);
+                return;
+            }
+
+            sessionData.uploadedFile = file;
+            
+            // 显示文件上传提示
+            const fileHint = document.createElement('div');
+            fileHint.className = 'file-upload-hint';
+            fileHint.innerHTML = `📎 已上传文件：<span class="file-name">${file.name}</span>（${(file.size / 1024).toFixed(1)}KB）`;
+            
+            const container = document.getElementById('chatContainer');
+            container.appendChild(fileHint);
+            container.scrollTop = container.scrollHeight;
+
+            // 显示用户上传了文件
+            addMessage(`我上传了文件：${file.name}`, true);
+
+            // 如果还没选择模式，自动选择附件模式
+            if (!sessionData.mode) {
+                selectMode('assisted');
+            } else {
+                // 发送文件到后端处理
+                await sendFileToBackend(file);
+            }
+        }
+
+        // 发送文件到后端
+        async function sendFileToBackend(file) {
+            showTyping();
+            disableInput();
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('session_id', sessionData.sessionId);
+                formData.append('mode', sessionData.mode);
+
+                const response = await fetch(`${API_BASE}/alchemist/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                hideTyping();
+
+                if (data.status === 'success') {
+                    addMessage(data.message);
+                    updateProgress(data.message);
+                } else {
+                    addMessage('文件处理失败，请重试或直接描述您的情况。');
+                }
+            } catch (error) {
+                hideTyping();
+                console.error('Error:', error);
+                addMessage('文件上传遇到问题，您可以先直接告诉我您的背景情况。');
+            }
+
+            enableInput();
+        }
+
+        // 显示欢迎消息
         function showWelcomeMessage() {
             const welcomeMessage = `🔮 **欢迎来到炼金坊！**
 
@@ -549,9 +1222,9 @@
 
 全程大约 20-30 分钟。您可以选择：
 
-**快速模式**：直接回答几个问题（适合思路清晰的专家）
+⚡ **快速模式**：直接回答几个问题（适合思路清晰的专家）
 
-**附件模式**：上传您的简历、述职报告或 KPI 结果，我来帮您挖掘潜在选题
+📎 **附件模式**：上传您的简历、述职报告或 KPI 结果，我来帮您挖掘潜在选题
 
 💡 这个过程会帮您：
 ✅ 找到您最擅长、最有价值的决策场景
@@ -560,11 +1233,10 @@
 ✅ 生成可以直接使用的 AI 提示词`;
 
             addMessage(welcomeMessage);
-            
-            // 显示模式选择按钮
             showModeButtons();
         }
 
+        // 显示模式选择按钮
         function showModeButtons() {
             const container = document.getElementById('chatContainer');
             
@@ -583,32 +1255,46 @@
             container.scrollTop = container.scrollHeight;
         }
 
+        // 选择模式
         function selectMode(mode) {
-            // 移除模式选择按钮
             const modeButtons = document.getElementById('modeButtonsDiv');
             if (modeButtons) modeButtons.remove();
             
             sessionData.mode = mode;
             
-            // 显示用户选择
             const modeText = mode === 'quick' ? '快速模式' : '附件模式';
             addMessage(`我选择 ${modeText}`, true);
             
-            // 显示进度条和输入框
             document.getElementById('progressBar').classList.remove('hidden');
             document.getElementById('inputContainer').classList.remove('hidden');
             
-            // 调用API获取AI响应
-            sendAIMessage(mode);
+            // 如果是附件模式且有上传的文件
+            if (mode === 'assisted' && sessionData.uploadedFile) {
+                sendFileToBackend(sessionData.uploadedFile);
+            } else {
+                sendAIMessage(mode);
+            }
         }
 
+        // 添加消息
         function addMessage(content, isUser = false) {
             const container = document.getElementById('chatContainer');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
             
-            // 支持Markdown格式（简单处理）
-            const formattedContent = formatMessage(content);
+            let formattedContent = formatMessage(content);
+            
+            // 检查是否包含Prompt输出
+            if (content.includes('```prompt') || content.includes('```markdown')) {
+                formattedContent = formatPromptOutput(content);
+            }
+            
+            // 检查是否是完成状态，显示打赏区域
+            if (content.includes('🎉') && content.includes('恭喜') && !sessionData.showReward) {
+                sessionData.completed = true;
+                sessionData.showReward = true;
+                trackComplete();
+            }
             
             messageDiv.innerHTML = `
                 <div class="avatar">${isUser ? '👤' : '🔮'}</div>
@@ -622,10 +1308,165 @@
                 role: isUser ? 'user' : 'assistant',
                 content: content
             });
+
+            // 如果完成，添加打赏区域
+            if (sessionData.showReward && !document.getElementById('rewardSection')) {
+                setTimeout(() => addRewardSection(), 500);
+            }
         }
 
+        // 格式化Prompt输出
+        function formatPromptOutput(text) {
+            // 提取代码块
+            const codeBlockRegex = /```(?:prompt|markdown)?\n?([\s\S]*?)```/g;
+            let result = text;
+            let match;
+            
+            while ((match = codeBlockRegex.exec(text)) !== null) {
+                const codeContent = match[1];
+                const replacement = `
+                    <div class="prompt-output">${escapeHtml(codeContent.trim())}</div>
+                    <button class="copy-btn" onclick="copyPrompt(this)">📋 复制Prompt</button>
+                `;
+                result = result.replace(match[0], replacement);
+            }
+            
+            return formatMessage(result);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 复制Prompt
+        function copyPrompt(btn) {
+            const promptDiv = btn.previousElementSibling;
+            const text = promptDiv.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '✅ 已复制！';
+                btn.disabled = true;
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            });
+        }
+
+        // 添加打赏区域
+        function addRewardSection() {
+            const container = document.getElementById('chatContainer');
+            
+            const rewardDiv = document.createElement('div');
+            rewardDiv.id = 'rewardSection';
+            rewardDiv.className = 'message ai';
+            rewardDiv.innerHTML = `
+                <div class="avatar">💝</div>
+                <div class="reward-section">
+                    <h3>💝 开通用户打赏功能</h3>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                        您的AI工具已经可以对外服务了！开通打赏功能，让受益者可以感谢您的智慧结晶。
+                    </p>
+                    <div class="reward-buttons">
+                        <button class="reward-btn primary" onclick="showQRUpload()">📷 上传收款二维码</button>
+                        <button class="reward-btn secondary" onclick="skipReward()">暂不开启</button>
+                    </div>
+                    <div class="qr-upload" id="qrUpload" style="display: none;">
+                        <input type="file" id="qrInput" accept="image/*" onchange="handleQRUpload(event)">
+                        <label for="qrInput" class="reward-btn primary" style="display: inline-block; margin-top: 10px;">
+                            选择图片
+                        </label>
+                        <img id="qrPreview" class="qr-preview" alt="收款码预览">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(rewardDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 显示二维码上传
+        function showQRUpload() {
+            document.getElementById('qrUpload').style.display = 'block';
+        }
+
+        // 跳过打赏
+        function skipReward() {
+            sessionData.showReward = false;
+            const rewardSection = document.getElementById('rewardSection');
+            if (rewardSection) {
+                rewardSection.remove();
+            }
+            addMessage('好的，您可以随时在个人中心开通打赏功能。祝您的AI工具大受欢迎！🌟');
+        }
+
+        // 处理二维码上传
+        async function handleQRUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('qrPreview');
+                preview.src = e.target.result;
+                preview.classList.add('show');
+                
+                // 上传到服务器
+                uploadQRCode(file);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 上传收款码
+        async function uploadQRCode(file) {
+            const formData = new FormData();
+            formData.append('qr_code', file);
+            formData.append('session_id', sessionData.sessionId);
+
+            try {
+                const response = await fetch(`${API_BASE}/alchemist/reward`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    addMessage('✅ 打赏功能已开通！您的用户现在可以通过扫码打赏来感谢您的智慧分享了！💝');
+                    trackRewardEnabled();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 统计完成
+        function trackComplete() {
+            fetch(`${API_BASE}/api/stats/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    sessionId: sessionData.sessionId,
+                    mode: sessionData.mode
+                })
+            }).catch(() => {});
+        }
+
+        // 统计打赏开通
+        function trackRewardEnabled() {
+            fetch(`${API_BASE}/api/stats/reward`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    sessionId: sessionData.sessionId
+                })
+            }).catch(() => {});
+        }
+
+        // 格式化消息
         function formatMessage(text) {
-            // 简单的Markdown格式化
             return text
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\n\n/g, '</p><p>')
@@ -634,6 +1475,7 @@
                 .replace(/$/, '</p>');
         }
 
+        // 显示输入中
         function showTyping() {
             const container = document.getElementById('chatContainer');
             const typingDiv = document.createElement('div');
@@ -641,10 +1483,10 @@
             typingDiv.className = 'message ai';
             typingDiv.innerHTML = `
                 <div class="avatar">🔮</div>
-                <div class="typing-indicator">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
+                <div class="typing-indicator" style="display: flex; gap: 4px; padding: 12px 16px; background: #f0f4ff; border-radius: 16px;">
+                    <div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: typingBounce 1.4s infinite;"></div>
+                    <div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: typingBounce 1.4s infinite; animation-delay: 0.2s;"></div>
+                    <div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: typingBounce 1.4s infinite; animation-delay: 0.4s;"></div>
                 </div>
             `;
             container.appendChild(typingDiv);
@@ -656,6 +1498,7 @@
             if (typing) typing.remove();
         }
 
+        // 发送AI消息
         async function sendAIMessage(mode) {
             showTyping();
             disableInput();
@@ -667,9 +1510,7 @@
 
                 const response = await fetch(`${API_BASE}/alchemist/chat`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: prompt,
                         session_id: sessionData.sessionId,
@@ -695,6 +1536,7 @@
             }
         }
 
+        // 本地首问（后端不可用时的备用）
         function getLocalFirstQuestion(mode) {
             if (mode === 'quick') {
                 return `很好！让我们开始快速模式。
@@ -724,31 +1566,28 @@
 - 在这个领域工作多少年了？
 - 主要负责哪些方面的工作？
 
-您可以简单描述，或者直接粘贴您的简历、项目总结等内容。`;
+您可以简单描述，或者直接上传您的简历、项目总结等文件。`;
             }
         }
 
+        // 发送消息
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const message = input.value.trim();
             
             if (!message) return;
 
-            // 显示用户消息
             addMessage(message, true);
             input.value = '';
             finalTranscript = '';
             
-            // 禁用输入
             disableInput();
             showTyping();
 
             try {
                 const response = await fetch(`${API_BASE}/alchemist/chat`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: message,
                         session_id: sessionData.sessionId,
@@ -773,9 +1612,10 @@
             }
 
             enableInput();
-            input.focus();
+            document.getElementById('userInput').focus();
         }
 
+        // 本地响应（备用）
         function getLocalResponse(userMessage) {
             const msg = userMessage.toLowerCase();
             
@@ -821,12 +1661,13 @@
             }
         }
 
+        // 更新进度
         function updateProgress(message) {
             if (message.includes('第二关') || message.includes('关卡2')) {
                 setProgress(2);
             } else if (message.includes('第三关') || message.includes('关卡3')) {
                 setProgress(3);
-            } else if (message.includes('第四关') || message.includes('关卡4') || message.includes('恭喜')) {
+            } else if (message.includes('第四关') || message.includes('关卡4') || message.includes('恭喜') || message.includes('🎉')) {
                 setProgress(4);
             }
         }
@@ -848,12 +1689,14 @@
             document.getElementById('userInput').disabled = true;
             document.getElementById('sendBtn').disabled = true;
             document.getElementById('voiceBtn').disabled = true;
+            document.getElementById('uploadBtn').style.pointerEvents = 'none';
         }
 
         function enableInput() {
             document.getElementById('userInput').disabled = false;
             document.getElementById('sendBtn').disabled = false;
             document.getElementById('voiceBtn').disabled = false;
+            document.getElementById('uploadBtn').style.pointerEvents = 'auto';
         }
 
         // 回车发送
