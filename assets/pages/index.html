@@ -1014,7 +1014,7 @@
                             </button>
                             <label class="action-btn" id="uploadBtn" style="cursor: pointer;">
                                 📎
-                                <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,.md" style="display: none;" onchange="handleFileUpload(event)">
+                                <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileUpload(event)">
                             </label>
                             <div class="input-wrapper">
                                 <input type="text" id="userInput" placeholder="输入或语音输入..." autocomplete="off" />
@@ -1452,49 +1452,58 @@
             }
         }
 
-        // 文件上传处理
+        // 文件上传处理（支持多文件）
         async function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
 
-            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'text/markdown'];
-            if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|doc|docx|txt|md)$/i)) {
-                addMessage('⚠️ 暂不支持该文件格式，请上传 PDF、Word、TXT 或 Markdown 文件。', false);
-                return;
+            // 检查文件大小（单个文件最大10MB）
+            for (let file of files) {
+                if (file.size > 10 * 1024 * 1024) {
+                    addMessage(`⚠️ 文件 "${file.name}" 大小超过10MB，请选择较小的文件`, false);
+                    return;
+                }
             }
 
-            if (file.size > 10 * 1024 * 1024) {
-                addMessage('⚠️ 文件大小不能超过 10MB', false);
-                return;
-            }
-
-            sessionData.uploadedFile = file;
+            // 显示上传的文件列表
+            const fileNames = Array.from(files).map(f => f.name).join('、');
+            const totalSize = Array.from(files).reduce((sum, f) => sum + f.size, 0);
             
             const fileHint = document.createElement('div');
             fileHint.className = 'file-upload-hint';
-            fileHint.innerHTML = `📎 已上传文件：<span class="file-name">${file.name}</span>（${(file.size / 1024).toFixed(1)}KB）`;
+            if (files.length === 1) {
+                fileHint.innerHTML = `📎 已上传：<span class="file-name">${files[0].name}</span>（${(files[0].size / 1024).toFixed(1)}KB）`;
+            } else {
+                fileHint.innerHTML = `📎 已上传 ${files.length} 个文件：${Array.from(files).map(f => `<span class="file-name">${f.name}</span>`).join('、')}（共 ${(totalSize / 1024).toFixed(1)}KB）`;
+            }
             
             const container = document.getElementById('chatContainer');
             container.appendChild(fileHint);
             container.scrollTop = container.scrollHeight;
 
-            addMessage(`我上传了文件：${file.name}`, true);
+            addMessage(`我上传了文件：${fileNames}`, true);
+
+            // 保存上传的文件
+            sessionData.uploadedFiles = Array.from(files);
 
             if (!sessionData.mode) {
-                selectMode('assisted');
+                selectMode('analyze');
             } else {
-                await sendFileToBackend(file);
+                await sendFilesToBackend(files);
             }
         }
 
-        // 发送文件到后端
-        async function sendFileToBackend(file) {
+        // 发送文件到后端（支持多文件）
+        async function sendFilesToBackend(files) {
             showTyping();
             disableInput();
 
             try {
                 const formData = new FormData();
-                formData.append('file', file);
+                // 添加所有文件
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('files', files[i]);
+                }
                 formData.append('session_id', sessionData.sessionId);
                 formData.append('mode', sessionData.mode);
 
@@ -1525,9 +1534,9 @@
         function showWelcomeMessage() {
             const welcomeMessage = `🔮 **欢迎来到炼金师助手！**
 
-我是炼金师小智。您的每一次成功，都是等待被提炼的黄金。如果您可以在一件事情上多次成功，那将是一笔重要的知识财富。
+我是炼金师小智，很高兴遇见您！✨
 
-今天，我们将把您脑中的 **"隐性知识"** 和 **"富饶经验"** 变成产品——甚至可以收费哦！
+您的每一次成功，都是等待被提炼的黄金。今天，我想帮您把那些宝贵的经验变成能帮到更多人的产品。
 
 ---
 
@@ -1541,9 +1550,11 @@
 
 💡 **您可以选择：**
 
-🚀 **快速模式**：回答几个问题，我来帮您梳理（适合思路清晰的专家）
+💬 **问答模式**：我来提问，您来回答，一步步梳理（适合想边聊边思考的人）
 
-📎 **附件模式**：上传简历/述职报告/KPI，我来帮您挖掘（适合想快速梳理的人）`;
+📊 **分析模式**：您提供材料（简历、述职报告、项目文档等），我来帮您分析挖掘
+
+📎 分析模式推荐上传附件（支持任意格式，可多个文件），但附件只是工具，您也可以直接描述~`;
 
             addMessage(welcomeMessage);
             showModeButtons();
@@ -1559,8 +1570,8 @@
             buttonsDiv.innerHTML = `
                 <div class="avatar">🔮</div>
                 <div class="mode-buttons" style="background: #f0f4ff; padding: 12px; border-radius: 16px;">
-                    <button class="mode-btn" onclick="selectMode('quick')">🚀 快速模式</button>
-                    <button class="mode-btn" onclick="selectMode('assisted')">📎 附件模式</button>
+                    <button class="mode-btn" onclick="selectMode('qa')">💬 问答模式</button>
+                    <button class="mode-btn" onclick="selectMode('analyze')">📊 分析模式</button>
                 </div>
             `;
             
@@ -1576,7 +1587,7 @@
             sessionData.mode = mode;
             
             // 显示用户选择
-            const modeText = mode === 'quick' ? '🚀 快速模式' : '📎 附件模式';
+            const modeText = mode === 'qa' ? '💬 问答模式' : '📊 分析模式';
             addMessage(modeText, true);
             
             // 显示输入框和进度条
