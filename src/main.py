@@ -278,6 +278,7 @@ async def alchemist_chat(request: Request):
         payload = await request.json()
         message = payload.get("message", "")
         session_id = payload.get("session_id", "default")
+        messages_history = payload.get("messages", [])  # 接收对话历史
         
         if not message:
             raise HTTPException(status_code=400, detail="消息不能为空")
@@ -289,9 +290,24 @@ async def alchemist_chat(request: Request):
         run_config = init_agent_config(agent, ctx)
         run_config["configurable"] = {"thread_id": session_id}
         
+        # 构建完整的消息列表
+        all_messages = []
+        
+        # 添加历史消息
+        for msg in messages_history:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            if role == "user":
+                all_messages.append({"type": "human", "content": content})
+            elif role == "assistant":
+                all_messages.append({"type": "ai", "content": content})
+        
+        # 添加当前消息
+        all_messages.append({"type": "human", "content": message})
+        
         # 准备输入
         input_data = {
-            "messages": [{"type": "human", "content": message}]
+            "messages": all_messages
         }
         
         # 调用Agent

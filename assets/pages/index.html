@@ -1704,9 +1704,10 @@
             disableInput();
 
             try {
+                // 使用自然的对话方式，而不是指令式
                 const prompt = mode === 'quick' 
-                    ? '用户选择了快速模式，请开始引导第一关的问题，直接提问用户最擅长解决什么问题。'
-                    : '用户选择了附件模式，请开始引导，先询问用户的职业背景和工作年限。';
+                    ? '我选择快速模式'
+                    : '我选择附件模式';
 
                 const response = await fetch(`${API_BASE}/alchemist/chat`, {
                     method: 'POST',
@@ -1714,7 +1715,8 @@
                     body: JSON.stringify({
                         message: prompt,
                         session_id: sessionData.sessionId,
-                        mode: mode
+                        mode: sessionData.mode,
+                        messages: sessionData.messages  // 发送对话历史
                     })
                 });
 
@@ -1791,7 +1793,8 @@
                     body: JSON.stringify({
                         message: message,
                         session_id: sessionData.sessionId,
-                        mode: sessionData.mode
+                        mode: sessionData.mode,
+                        messages: sessionData.messages  // 发送对话历史
                     })
                 });
 
