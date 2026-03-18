@@ -33,7 +33,6 @@
             display: flex;
         }
 
-        /* 整体布局 */
         .app-container {
             display: flex;
             width: 100%;
@@ -41,10 +40,10 @@
             height: 100dvh;
         }
 
-        /* 左侧运营数据栏 */
+        /* 左侧功能栏 */
         .sidebar {
-            width: 280px;
-            background: rgba(255, 255, 255, 0.95);
+            width: 300px;
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
@@ -63,19 +62,73 @@
         }
 
         .sidebar-header {
-            padding: 20px;
+            padding: 15px 20px;
             background: var(--primary-gradient);
             color: white;
         }
 
         .sidebar-header h2 {
-            font-size: 18px;
-            margin-bottom: 5px;
+            font-size: 16px;
+            margin-bottom: 3px;
         }
 
         .sidebar-header p {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.9;
+        }
+
+        /* 分页标签 */
+        .sidebar-tabs {
+            display: flex;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px 10px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .sidebar-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .sidebar-tab.active {
+            color: var(--primary-color);
+            background: white;
+        }
+
+        .sidebar-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: var(--primary-gradient);
+            border-radius: 1px;
+        }
+
+        .sidebar-tab .tab-icon {
+            margin-right: 5px;
+        }
+
+        .sidebar-tab .tab-badge {
+            display: inline-block;
+            background: var(--danger-color);
+            color: white;
+            font-size: 10px;
+            padding: 1px 5px;
+            border-radius: 10px;
+            margin-left: 5px;
         }
 
         .sidebar-content {
@@ -84,24 +137,36 @@
             padding: 15px;
         }
 
+        /* 分页内容 */
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
         .stats-section {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .stats-section-title {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-light);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             padding-bottom: 5px;
             border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .stat-card {
             background: white;
             border-radius: 12px;
-            padding: 15px;
+            padding: 14px;
             margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             border: 1px solid var(--border-color);
         }
 
@@ -109,15 +174,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .stat-card-icon {
-            font-size: 24px;
+            font-size: 22px;
         }
 
         .stat-card-trend {
-            font-size: 12px;
+            font-size: 11px;
             padding: 2px 6px;
             border-radius: 4px;
         }
@@ -133,20 +198,20 @@
         }
 
         .stat-card-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
             color: var(--text-dark);
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .stat-card-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-gray);
         }
 
         .stat-card-sub {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid var(--border-color);
@@ -157,14 +222,145 @@
         }
 
         .stat-card-sub-value {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-dark);
         }
 
         .stat-card-sub-label {
+            font-size: 10px;
+            color: var(--text-light);
+        }
+
+        /* 漏斗图 */
+        .funnel-item {
+            margin-bottom: 12px;
+        }
+
+        .funnel-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .funnel-label {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .funnel-value {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .funnel-bar {
+            height: 6px;
+            background: var(--bg-light);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .funnel-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .funnel-fill.stage-1 { background: var(--primary-gradient); }
+        .funnel-fill.stage-2 { background: var(--success-color); }
+        .funnel-fill.stage-3 { background: var(--warning-color); }
+        .funnel-fill.stage-4 { background: var(--danger-color); }
+
+        /* 专家产出列表 */
+        .ai-tool-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ai-tool-card {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ai-tool-card:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .ai-tool-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .ai-tool-icon {
+            font-size: 20px;
+        }
+
+        .ai-tool-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            flex: 1;
+        }
+
+        .ai-tool-status {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .ai-tool-status.active {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .ai-tool-status.draft {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning-color);
+        }
+
+        .ai-tool-desc {
+            font-size: 11px;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .ai-tool-stats {
+            display: flex;
+            gap: 12px;
             font-size: 11px;
             color: var(--text-light);
+        }
+
+        .ai-tool-stats span {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-text {
+            font-size: 13px;
         }
 
         /* 主内容区 */
@@ -213,32 +409,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 5px;
-            margin-left: 30px;
-        }
-
-        .nav-tab {
-            padding: 8px 16px;
-            border: none;
-            background: none;
-            font-size: 14px;
-            color: var(--text-gray);
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .nav-tab:hover {
-            background: var(--bg-light);
-        }
-
-        .nav-tab.active {
-            background: var(--primary-gradient);
-            color: white;
         }
 
         /* 内容容器 */
@@ -438,11 +608,6 @@
 
         .copy-btn:hover {
             background: var(--secondary-color);
-        }
-
-        .copy-btn:disabled {
-            background: var(--text-light);
-            cursor: not-allowed;
         }
 
         /* 打赏区域 */
@@ -673,10 +838,6 @@
                 display: block;
             }
 
-            .nav-tabs {
-                display: none;
-            }
-
             .alchemist-page {
                 max-height: calc(100vh - 100px);
                 max-height: calc(100dvh - 100px);
@@ -739,167 +900,165 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 左侧运营数据栏 -->
+        <!-- 左侧功能栏 -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>📊 运营数据看板</h2>
-                <p>实时监控平台运营情况</p>
+                <h2>📊 功能中心</h2>
+                <p>数据概览与工具管理</p>
             </div>
+            
+            <!-- 分页标签 -->
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab active" onclick="switchSidebarTab('platform')">
+                    <span class="tab-icon">📈</span>平台数据
+                </button>
+                <button class="sidebar-tab" onclick="switchSidebarTab('expert')">
+                    <span class="tab-icon">🤖</span>我的产出
+                    <span class="tab-badge" id="toolCount">0</span>
+                </button>
+            </div>
+            
             <div class="sidebar-content">
-                <!-- 核心指标 -->
-                <div class="stats-section">
-                    <div class="stats-section-title">核心指标</div>
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <span class="stat-card-icon">👁️</span>
-                            <span class="stat-card-trend up">+12.5%</span>
-                        </div>
-                        <div class="stat-card-value" id="totalVisits">1,234</div>
-                        <div class="stat-card-label">总访问量</div>
-                        <div class="stat-card-sub">
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="todayVisits">89</div>
-                                <div class="stat-card-sub-label">今日访问</div>
+                <!-- 平台运营数据 -->
+                <div class="tab-panel active" id="platformPanel">
+                    <!-- 核心指标 -->
+                    <div class="stats-section">
+                        <div class="stats-section-title">📊 核心指标</div>
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <span class="stat-card-icon">👁️</span>
+                                <span class="stat-card-trend up">+12.5%</span>
                             </div>
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="weekVisits">456</div>
-                                <div class="stat-card-sub-label">本周访问</div>
+                            <div class="stat-card-value" id="totalVisits">1,234</div>
+                            <div class="stat-card-label">总访问量</div>
+                            <div class="stat-card-sub">
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="todayVisits">89</div>
+                                    <div class="stat-card-sub-label">今日访问</div>
+                                </div>
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="weekVisits">456</div>
+                                    <div class="stat-card-sub-label">本周访问</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <span class="stat-card-icon">👥</span>
+                                <span class="stat-card-trend up">+8.3%</span>
+                            </div>
+                            <div class="stat-card-value" id="totalUsers">567</div>
+                            <div class="stat-card-label">访问人数</div>
+                            <div class="stat-card-sub">
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="todayUsers">23</div>
+                                    <div class="stat-card-sub-label">今日新增</div>
+                                </div>
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="returningUsers">189</div>
+                                    <div class="stat-card-sub-label">回访用户</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <span class="stat-card-icon">🤖</span>
+                                <span class="stat-card-trend up">+15.2%</span>
+                            </div>
+                            <div class="stat-card-value" id="totalOutputs">89</div>
+                            <div class="stat-card-label">产出工具数</div>
+                            <div class="stat-card-sub">
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="todayOutputs">5</div>
+                                    <div class="stat-card-sub-label">今日产出</div>
+                                </div>
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="avgRules">4.2</div>
+                                    <div class="stat-card-sub-label">平均规则数</div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <span class="stat-card-icon">👥</span>
-                            <span class="stat-card-trend up">+8.3%</span>
-                        </div>
-                        <div class="stat-card-value" id="totalUsers">567</div>
-                        <div class="stat-card-label">访问人数</div>
-                        <div class="stat-card-sub">
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="todayUsers">23</div>
-                                <div class="stat-card-sub-label">今日新增</div>
+                    <!-- 转化漏斗 -->
+                    <div class="stats-section">
+                        <div class="stats-section-title">🔄 转化漏斗</div>
+                        <div class="stat-card">
+                            <div class="funnel-item">
+                                <div class="funnel-header">
+                                    <span class="funnel-label">开始炼金</span>
+                                    <span class="funnel-value" id="funnelStart">456</span>
+                                </div>
+                                <div class="funnel-bar">
+                                    <div class="funnel-fill stage-1" style="width: 100%"></div>
+                                </div>
                             </div>
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="returningUsers">189</div>
-                                <div class="stat-card-sub-label">回访用户</div>
+                            <div class="funnel-item">
+                                <div class="funnel-header">
+                                    <span class="funnel-label">完成选题</span>
+                                    <span class="funnel-value" id="funnelTopic">234</span>
+                                </div>
+                                <div class="funnel-bar">
+                                    <div class="funnel-fill stage-2" style="width: 51%"></div>
+                                </div>
+                            </div>
+                            <div class="funnel-item">
+                                <div class="funnel-header">
+                                    <span class="funnel-label">完成规则</span>
+                                    <span class="funnel-value" id="funnelRules">156</span>
+                                </div>
+                                <div class="funnel-bar">
+                                    <div class="funnel-fill stage-3" style="width: 34%"></div>
+                                </div>
+                            </div>
+                            <div class="funnel-item">
+                                <div class="funnel-header">
+                                    <span class="funnel-label">产出工具</span>
+                                    <span class="funnel-value" id="funnelOutput">89</span>
+                                </div>
+                                <div class="funnel-bar">
+                                    <div class="funnel-fill stage-4" style="width: 19%"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <span class="stat-card-icon">🤖</span>
-                            <span class="stat-card-trend up">+15.2%</span>
-                        </div>
-                        <div class="stat-card-value" id="totalOutputs">89</div>
-                        <div class="stat-card-label">产出工具数</div>
-                        <div class="stat-card-sub">
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="todayOutputs">5</div>
-                                <div class="stat-card-sub-label">今日产出</div>
+                    <!-- 商业化指标 -->
+                    <div class="stats-section">
+                        <div class="stats-section-title">💰 商业化指标</div>
+                        <div class="stat-card">
+                            <div class="stat-card-sub" style="border: none; padding-top: 0;">
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="rewardRate">32%</div>
+                                    <div class="stat-card-sub-label">打赏开通率</div>
+                                </div>
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="shareRate">18%</div>
+                                    <div class="stat-card-sub-label">分享率</div>
+                                </div>
                             </div>
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="avgRules">4.2</div>
-                                <div class="stat-card-sub-label">平均规则数</div>
+                            <div class="stat-card-sub">
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="avgTime">12.5</div>
+                                    <div class="stat-card-sub-label">平均用时(分钟)</div>
+                                </div>
+                                <div class="stat-card-sub-item">
+                                    <div class="stat-card-sub-value" id="completeRate">19.5%</div>
+                                    <div class="stat-card-sub-label">完成率</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 转化漏斗 -->
-                <div class="stats-section">
-                    <div class="stats-section-title">转化漏斗</div>
-                    <div class="stat-card">
-                        <div style="margin-bottom: 15px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-size: 13px; color: var(--text-gray);">开始炼金</span>
-                                <span style="font-size: 13px; font-weight: bold;" id="funnelStart">456</span>
-                            </div>
-                            <div style="height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden;">
-                                <div style="width: 100%; height: 100%; background: var(--primary-gradient);"></div>
-                            </div>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-size: 13px; color: var(--text-gray);">完成选题</span>
-                                <span style="font-size: 13px; font-weight: bold;" id="funnelTopic">234</span>
-                            </div>
-                            <div style="height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden;">
-                                <div style="width: 51%; height: 100%; background: var(--success-color);"></div>
-                            </div>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-size: 13px; color: var(--text-gray);">完成规则</span>
-                                <span style="font-size: 13px; font-weight: bold;" id="funnelRules">156</span>
-                            </div>
-                            <div style="height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden;">
-                                <div style="width: 34%; height: 100%; background: var(--warning-color);"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-size: 13px; color: var(--text-gray);">产出工具</span>
-                                <span style="font-size: 13px; font-weight: bold;" id="funnelOutput">89</span>
-                            </div>
-                            <div style="height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden;">
-                                <div style="width: 19%; height: 100%; background: var(--danger-color);"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 商业化指标 -->
-                <div class="stats-section">
-                    <div class="stats-section-title">商业化指标</div>
-                    <div class="stat-card">
-                        <div class="stat-card-sub" style="border: none; padding-top: 0;">
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="rewardRate">32%</div>
-                                <div class="stat-card-sub-label">打赏开通率</div>
-                            </div>
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="shareRate">18%</div>
-                                <div class="stat-card-sub-label">分享率</div>
-                            </div>
-                        </div>
-                        <div class="stat-card-sub">
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="avgTime">12.5</div>
-                                <div class="stat-card-sub-label">平均用时(分钟)</div>
-                            </div>
-                            <div class="stat-card-sub-item">
-                                <div class="stat-card-sub-value" id="completeRate">19.5%</div>
-                                <div class="stat-card-sub-label">完成率</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 热门选题 -->
-                <div class="stats-section">
-                    <div class="stats-section-title">🔥 热门选题 TOP5</div>
-                    <div class="stat-card" style="font-size: 13px;">
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <span>1. 渠道投放评估</span>
-                            <span style="color: var(--primary-color);">23次</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <span>2. 简历筛选判断</span>
-                            <span style="color: var(--primary-color);">18次</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <span>3. 投资机会判断</span>
-                            <span style="color: var(--primary-color);">15次</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <span>4. 需求优先级评估</span>
-                            <span style="color: var(--primary-color);">12次</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-                            <span>5. 故障根因诊断</span>
-                            <span style="color: var(--primary-color);">10次</span>
+                <!-- 专家产出数据 -->
+                <div class="tab-panel" id="expertPanel">
+                    <div class="stats-section">
+                        <div class="stats-section-title">🤖 我的AI工具</div>
+                        <div class="ai-tool-list" id="aiToolList">
+                            <!-- 动态加载 -->
                         </div>
                     </div>
                 </div>
@@ -917,10 +1076,6 @@
                 <div class="nav-logo">
                     <span class="nav-logo-icon">🔮</span>
                     <span class="nav-logo-text">炼金坊</span>
-                </div>
-                <div class="nav-tabs">
-                    <button class="nav-tab active" onclick="switchPage('home')">🏠 炼金主页</button>
-                    <button class="nav-tab" onclick="switchPage('data')">📊 数据看板</button>
                 </div>
             </nav>
 
@@ -991,7 +1146,9 @@
             messages: [],
             uploadedFile: null,
             completed: false,
-            showReward: false
+            showReward: false,
+            // 专家产出数据
+            myTools: []
         };
 
         // API地址
@@ -1007,8 +1164,72 @@
             initSpeechRecognition();
             showWelcomeMessage();
             loadStatsData();
+            loadMyTools();
             trackVisit();
         };
+
+        // 切换侧边栏分页
+        function switchSidebarTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            
+            event.target.closest('.sidebar-tab').classList.add('active');
+            document.getElementById(tab + 'Panel').classList.add('active');
+        }
+
+        // 加载我的工具列表
+        function loadMyTools() {
+            const tools = JSON.parse(localStorage.getItem('myAITools') || '[]');
+            sessionData.myTools = tools;
+            renderMyTools();
+        }
+
+        // 渲染我的工具
+        function renderMyTools() {
+            const container = document.getElementById('aiToolList');
+            document.getElementById('toolCount').textContent = sessionData.myTools.length;
+            
+            if (sessionData.myTools.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🤖</div>
+                        <div class="empty-state-text">还没有产出AI工具<br>完成炼金后这里会展示</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sessionData.myTools.map((tool, index) => `
+                <div class="ai-tool-card" onclick="viewTool(${index})">
+                    <div class="ai-tool-header">
+                        <span class="ai-tool-icon">${tool.icon || '🤖'}</span>
+                        <span class="ai-tool-name">${tool.name}</span>
+                        <span class="ai-tool-status ${tool.status || 'active'}">${tool.status === 'draft' ? '草稿' : '已发布'}</span>
+                    </div>
+                    <div class="ai-tool-desc">${tool.description}</div>
+                    <div class="ai-tool-stats">
+                        <span>👁️ ${tool.views || 0}</span>
+                        <span>💬 ${tool.uses || 0}</span>
+                        <span>💝 ${tool.rewards || 0}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 保存工具
+        function saveTool(toolData) {
+            const tools = JSON.parse(localStorage.getItem('myAITools') || '[]');
+            toolData.id = Date.now();
+            toolData.createdAt = new Date().toISOString();
+            toolData.views = 0;
+            toolData.uses = 0;
+            toolData.rewards = 0;
+            toolData.status = 'active';
+            tools.unshift(toolData);
+            localStorage.setItem('myAITools', JSON.stringify(tools));
+            sessionData.myTools = tools;
+            renderMyTools();
+        }
 
         // 访问统计
         function trackVisit() {
@@ -1030,7 +1251,6 @@
                 const data = await response.json();
                 updateStatsUI(data);
             } catch (e) {
-                // 使用模拟数据
                 console.log('Using default stats data');
             }
         }
@@ -1060,16 +1280,6 @@
             const overlay = document.getElementById('overlay');
             sidebar.classList.toggle('show');
             overlay.classList.toggle('show');
-        }
-
-        // 切换页面
-        function switchPage(page) {
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            if (page === 'data') {
-                toggleSidebar();
-            }
         }
 
         // 初始化语音识别
@@ -1159,7 +1369,6 @@
 
             sessionData.uploadedFile = file;
             
-            // 显示文件上传提示
             const fileHint = document.createElement('div');
             fileHint.className = 'file-upload-hint';
             fileHint.innerHTML = `📎 已上传文件：<span class="file-name">${file.name}</span>（${(file.size / 1024).toFixed(1)}KB）`;
@@ -1168,14 +1377,11 @@
             container.appendChild(fileHint);
             container.scrollTop = container.scrollHeight;
 
-            // 显示用户上传了文件
             addMessage(`我上传了文件：${file.name}`, true);
 
-            // 如果还没选择模式，自动选择附件模式
             if (!sessionData.mode) {
                 selectMode('assisted');
             } else {
-                // 发送文件到后端处理
                 await sendFileToBackend(file);
             }
         }
@@ -1268,7 +1474,6 @@
             document.getElementById('progressBar').classList.remove('hidden');
             document.getElementById('inputContainer').classList.remove('hidden');
             
-            // 如果是附件模式且有上传的文件
             if (mode === 'assisted' && sessionData.uploadedFile) {
                 sendFileToBackend(sessionData.uploadedFile);
             } else {
@@ -1284,12 +1489,10 @@
             
             let formattedContent = formatMessage(content);
             
-            // 检查是否包含Prompt输出
             if (content.includes('```prompt') || content.includes('```markdown')) {
                 formattedContent = formatPromptOutput(content);
             }
             
-            // 检查是否是完成状态，显示打赏区域
             if (content.includes('🎉') && content.includes('恭喜') && !sessionData.showReward) {
                 sessionData.completed = true;
                 sessionData.showReward = true;
@@ -1309,7 +1512,6 @@
                 content: content
             });
 
-            // 如果完成，添加打赏区域
             if (sessionData.showReward && !document.getElementById('rewardSection')) {
                 setTimeout(() => addRewardSection(), 500);
             }
@@ -1317,7 +1519,6 @@
 
         // 格式化Prompt输出
         function formatPromptOutput(text) {
-            // 提取代码块
             const codeBlockRegex = /```(?:prompt|markdown)?\n?([\s\S]*?)```/g;
             let result = text;
             let match;
@@ -1414,7 +1615,6 @@
                 preview.src = e.target.result;
                 preview.classList.add('show');
                 
-                // 上传到服务器
                 uploadQRCode(file);
             };
             reader.readAsDataURL(file);
@@ -1536,7 +1736,7 @@
             }
         }
 
-        // 本地首问（后端不可用时的备用）
+        // 本地首问
         function getLocalFirstQuestion(mode) {
             if (mode === 'quick') {
                 return `很好！让我们开始快速模式。
@@ -1615,7 +1815,7 @@
             document.getElementById('userInput').focus();
         }
 
-        // 本地响应（备用）
+        // 本地响应
         function getLocalResponse(userMessage) {
             const msg = userMessage.toLowerCase();
             
