@@ -12,6 +12,7 @@ from langgraph.graph.message import add_messages
 from langchain_core.messages import AnyMessage
 from coze_coding_utils.runtime_ctx.context import default_headers
 from storage.memory.memory_saver import get_memory_saver
+from tools.document_parser import parse_document  # 导入文档解析工具
 
 LLM_CONFIG = "config/agent_llm_config.json"
 
@@ -62,10 +63,18 @@ def build_agent(ctx=None):
         default_headers=default_headers(ctx) if ctx else {}
     )
 
+    # 从配置中读取工具列表
+    tools_config = cfg.get("tools", [])
+    tools = []
+    
+    # 根据配置添加工具
+    if "parse_document" in tools_config:
+        tools.append(parse_document)
+
     return create_agent(
         model=llm,
         system_prompt=cfg.get("sp"),
-        tools=[],
+        tools=tools,
         checkpointer=get_memory_saver(),
         state_schema=AgentState,
     )
