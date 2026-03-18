@@ -12,17 +12,30 @@ from coze_coding_utils.runtime_ctx.context import new_context
 # 预设验证码（实际生产环境应该用数据库）
 # 格式: {验证码: {"usage_limit": 5, "expires_at": "2025-12-31"}}
 VERIFICATION_CODES = {
-    # 体验版 ¥9.9 / 5次
+    # 体验版 ¥9.9 / 5次（内测激活码，可多次使用）
     "ALCH-TRIAL-2025": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
-    "ALCH-TRIAL-NEW": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-001": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-002": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-003": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-004": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-005": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-006": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-007": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-008": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-009": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    "GOLD-010": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
     
     # 标准版 ¥29.9 / 20次
-    "ALCH-STD-2025": {"usage_limit": 20, "plan": "标准版", "price": 29.9},
-    "ALCH-STD-NEW": {"usage_limit": 20, "plan": "标准版", "price": 29.9},
+    "SILVER-001": {"usage_limit": 20, "plan": "标准版", "price": 29.9},
+    "SILVER-002": {"usage_limit": 20, "plan": "标准版", "price": 29.9},
+    "SILVER-003": {"usage_limit": 20, "plan": "标准版", "price": 29.9},
+    "SILVER-004": {"usage_limit": 20, "plan": "标准版", "price": 29.9},
+    "SILVER-005": {"usage_limit": 20, "plan": "标准版", "price": 29.9},
     
     # 年度会员 ¥99 / 100次
-    "ALCH-PRO-2025": {"usage_limit": 100, "plan": "年度会员", "price": 99},
-    "ALCH-PRO-NEW": {"usage_limit": 100, "plan": "年度会员", "price": 99},
+    "DIAMOND-001": {"usage_limit": 100, "plan": "年度会员", "price": 99},
+    "DIAMOND-002": {"usage_limit": 100, "plan": "年度会员", "price": 99},
+    "DIAMOND-003": {"usage_limit": 100, "plan": "年度会员", "price": 99},
 }
 
 # 用户权限存储路径
