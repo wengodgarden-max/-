@@ -15,216 +15,66 @@
             font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
 
         .container {
-            max-width: 900px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            max-height: 800px;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            min-height: 80vh;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .header .subtitle {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* 欢迎页 */
-        .welcome-screen {
-            text-align: center;
-        }
-
-        .welcome-screen .icon {
-            font-size: 80px;
-            margin-bottom: 30px;
-        }
-
-        .welcome-screen h2 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .welcome-screen p {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
-
-        .mode-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 15px 40px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        /* 关卡卡片 */
-        .level-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-        }
-
-        .level-title {
+            padding: 20px 30px;
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 20px;
         }
 
-        .level-number {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .header-icon {
+            font-size: 40px;
+        }
+
+        .header-text h1 {
             font-size: 24px;
-            font-weight: bold;
+            margin-bottom: 5px;
         }
 
-        .level-title h3 {
-            font-size: 22px;
-            color: #333;
-        }
-
-        .question-card {
-            background: white;
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-
-        .question-card .question-label {
+        .header-text p {
             font-size: 14px;
-            color: #667eea;
-            font-weight: 600;
-            margin-bottom: 10px;
+            opacity: 0.9;
         }
 
-        .question-card .question-text {
-            font-size: 16px;
-            color: #333;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .question-card textarea {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            resize: vertical;
-            font-family: inherit;
-            min-height: 100px;
-        }
-
-        .question-card textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .example-box {
-            background: #f0f4ff;
-            padding: 12px 15px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .example-box strong {
-            color: #667eea;
-        }
-
-        /* 进度条 */
         .progress-bar {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .progress-bar::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 10%;
-            right: 10%;
-            height: 3px;
-            background: #e0e0e0;
-            z-index: 0;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .progress-step {
             display: flex;
             flex-direction: column;
             align-items: center;
-            z-index: 1;
+            flex: 1;
         }
 
         .progress-circle {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: #e0e0e0;
             color: #999;
@@ -232,7 +82,8 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            margin-bottom: 8px;
+            font-size: 14px;
+            margin-bottom: 6px;
             transition: all 0.3s;
         }
 
@@ -247,128 +98,306 @@
         }
 
         .progress-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
             text-align: center;
         }
 
-        /* 结果页面 */
-        .result-box {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .result-box h4 {
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .message.ai .avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .message.user .avatar {
+            background: #e0e0e0;
+        }
+
+        .message-content {
+            padding: 15px 18px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .message.ai .message-content {
+            background: #f0f4ff;
+            color: #333;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 15px 18px;
+            background: #f0f4ff;
+            border-radius: 18px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #userInput {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #userInput:focus {
+            border-color: #667eea;
+        }
+
+        #userInput:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        .send-btn:disabled {
+            background: #e0e0e0;
+            cursor: not-allowed;
+        }
+
+        .result-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+
+        .result-panel h4 {
             color: #667eea;
-            margin-bottom: 15px;
-            font-size: 18px;
+            margin-bottom: 12px;
+            font-size: 16px;
         }
 
         .result-content {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             line-height: 1.8;
             white-space: pre-wrap;
+            font-size: 14px;
         }
 
-        .final-prompt {
+        .final-prompt-box {
             background: #1e1e1e;
             color: #d4d4d4;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.6;
             white-space: pre-wrap;
             overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
-        .copy-btn {
+        .action-buttons {
+            display: flex;
+            gap: 10px;
             margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
             background: #4caf50;
             color: white;
         }
 
-        /* 加载动画 */
-        .loading {
+        .mode-selector {
+            padding: 30px;
             text-align: center;
-            padding: 40px;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+        .mode-selector h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .mode-selector p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
         }
 
-        /* 规则编辑器 */
-        .rule-editor {
+        .mode-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 20px 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
             background: white;
-            border: 2px dashed #d0d0d0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
         }
 
-        .rule-field {
-            margin-bottom: 15px;
+        .mode-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .rule-field label {
-            display: block;
-            font-size: 13px;
-            color: #667eea;
+        .mode-btn .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .mode-btn .title {
+            font-size: 16px;
             font-weight: 600;
+            color: #333;
             margin-bottom: 5px;
         }
 
-        .rule-field input,
-        .rule-field textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .add-rule-btn {
-            background: #e3f2fd;
-            color: #667eea;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .remove-rule-btn {
-            background: #ffebee;
-            color: #f44336;
-            padding: 5px 15px;
+        .mode-btn .desc {
             font-size: 13px;
+            color: #999;
         }
 
-        /* 响应式 */
         @media (max-width: 600px) {
+            .container {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+            }
+            
             .mode-buttons {
                 flex-direction: column;
             }
             
-            .content {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
+            .mode-btn {
+                padding: 15px 20px;
             }
         }
     </style>
@@ -376,452 +405,356 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔮 决策炼金坊</h1>
-            <p class="subtitle">把你的判断力变成付费AI工具</p>
+            <div class="header-icon">🔮</div>
+            <div class="header-text">
+                <h1>决策炼金坊</h1>
+                <p>把你的判断力变成付费AI工具</p>
+            </div>
         </div>
 
-        <div class="content">
-            <!-- 欢迎页面 -->
-            <div id="welcome" class="welcome-screen">
-                <div class="icon">💎</div>
-                <h2>欢迎来到决策炼金坊！</h2>
-                <p>
-                    您的每一次成功决策，都是等待被提炼的黄金。<br>
-                    今天，我们将把您脑中的"隐性知识"变成一款能帮别人解决问题的AI工具——甚至可以收费哦！
-                </p>
-                <p style="font-size: 14px; color: #999;">全程大约20-30分钟</p>
-                <div class="mode-buttons">
-                    <button class="btn btn-primary" onclick="startGame('quick')">
-                        🚀 快速模式
-                    </button>
-                    <button class="btn btn-secondary" onclick="startGame('attachment')">
-                        📎 附件模式
-                    </button>
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-step">
+                <div class="progress-circle active" id="step1">1</div>
+                <span class="progress-label">锁定选题</span>
+            </div>
+            <div class="progress-step">
+                <div class="progress-circle" id="step2">2</div>
+                <span class="progress-label">拆解决策</span>
+            </div>
+            <div class="progress-step">
+                <div class="progress-circle" id="step3">3</div>
+                <span class="progress-label">结构化</span>
+            </div>
+            <div class="progress-step">
+                <div class="progress-circle" id="step4">4</div>
+                <span class="progress-label">封装工具</span>
+            </div>
+        </div>
+
+        <!-- 模式选择页面 -->
+        <div id="modeSelector" class="mode-selector">
+            <h2>💎 欢迎来到决策炼金坊！</h2>
+            <p>
+                您的每一次成功决策，都是等待被提炼的黄金。<br>
+                今天，我们将把您脑中的"隐性知识"变成一款能帮别人解决问题的AI工具！
+            </p>
+            <div class="mode-buttons">
+                <div class="mode-btn" onclick="startChat('quick')">
+                    <div class="icon">🚀</div>
+                    <div class="title">快速模式</div>
+                    <div class="desc">适合思路清晰的专家</div>
+                </div>
+                <div class="mode-btn" onclick="startChat('attachment')">
+                    <div class="icon">📎</div>
+                    <div class="title">附件模式</div>
+                    <div class="desc">上传简历等辅助材料</div>
                 </div>
             </div>
+        </div>
 
-            <!-- 进度条 -->
-            <div id="progress" class="progress-bar hidden">
-                <div class="progress-step">
-                    <div class="progress-circle active" id="step1">1</div>
-                    <span class="progress-label">锁定选题</span>
-                </div>
-                <div class="progress-step">
-                    <div class="progress-circle" id="step2">2</div>
-                    <span class="progress-label">拆解决策</span>
-                </div>
-                <div class="progress-step">
-                    <div class="progress-circle" id="step3">3</div>
-                    <span class="progress-label">结构化</span>
-                </div>
-                <div class="progress-step">
-                    <div class="progress-circle" id="step4">4</div>
-                    <span class="progress-label">封装工具</span>
-                </div>
+        <!-- 聊天界面 -->
+        <div id="chatContainer" class="chat-container" style="display: none;"></div>
+
+        <!-- 输入区域 -->
+        <div id="inputContainer" class="input-container" style="display: none;">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="输入您的回答..." />
             </div>
-
-            <!-- 关卡1 -->
-            <div id="level1" class="hidden">
-                <div class="level-card">
-                    <div class="level-title">
-                        <div class="level-number">1</div>
-                        <h3>锁定宝藏选题</h3>
-                    </div>
-                    
-                    <div class="question-card">
-                        <div class="question-label">问题 1</div>
-                        <div class="question-text">您最擅长解决哪类问题？</div>
-                        <textarea id="q1_1" placeholder="可以是工作中经常遇到的，也可以是别人经常向您请教的..."></textarea>
-                        <div class="example-box">
-                            <strong>示例：</strong>判断一个新渠道投放是否值得加码、快速诊断系统故障根因、评估产品功能该不该做
-                        </div>
-                    </div>
-
-                    <div class="question-card">
-                        <div class="question-label">问题 2</div>
-                        <div class="question-text">谁最需要这个能力？</div>
-                        <textarea id="q1_2" placeholder="描述目标用户——他们是什么岗位？什么经验水平？"></textarea>
-                        <div class="example-box">
-                            <strong>示例：</strong>刚入职的投放专员，每天面对数据报表不知道如何调整预算
-                        </div>
-                    </div>
-
-                    <div class="question-card">
-                        <div class="question-label">问题 3</div>
-                        <div class="question-text">如果他们搞错了，会有什么后果？</div>
-                        <textarea id="q1_3" placeholder="判断失误会造成什么损失？"></textarea>
-                        <div class="example-box">
-                            <strong>示例：</strong>盲目加码导致预算浪费，或者错过优质渠道
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="submitLevel1()" style="width: 100%;">
-                        下一步 ➜
-                    </button>
-                </div>
-            </div>
-
-            <!-- 关卡2 -->
-            <div id="level2" class="hidden">
-                <div class="level-card">
-                    <div class="level-title">
-                        <div class="level-number">2</div>
-                        <h3>拆解您的决策</h3>
-                    </div>
-                    
-                    <div class="question-card">
-                        <div class="question-label">问题 1</div>
-                        <div class="question-text">当您面对这个场景时，您最先看什么？第一个要判断的是什么？</div>
-                        <textarea id="q2_1" placeholder="描述您的第一步判断逻辑..."></textarea>
-                    </div>
-
-                    <div class="question-card">
-                        <div class="question-label">问题 2</div>
-                        <div class="question-text">您怎么判断当前情况属于"好"还是"坏"？请列出2-3个关键区分标准。</div>
-                        <textarea id="q2_2" placeholder="列出关键指标或信号..."></textarea>
-                    </div>
-
-                    <div class="question-card">
-                        <div class="question-label">问题 3</div>
-                        <div class="question-text">什么情况会让您改变原来的决策方向？</div>
-                        <textarea id="q2_3" placeholder="描述转折信号..."></textarea>
-                    </div>
-
-                    <div class="question-card">
-                        <div class="question-label">问题 4</div>
-                        <div class="question-text">新手在这个场景中最容易犯什么错误？</div>
-                        <textarea id="q2_4" placeholder="描述常见误区..."></textarea>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="submitLevel2()" style="width: 100%;">
-                        下一步 ➜
-                    </button>
-                </div>
-            </div>
-
-            <!-- 关卡3 -->
-            <div id="level3" class="hidden">
-                <div class="level-card">
-                    <div class="level-title">
-                        <div class="level-number">3</div>
-                        <h3>结构化为决策流</h3>
-                    </div>
-                    
-                    <p style="margin-bottom: 20px; color: #666;">
-                        请填写下面的规则模板，每条规则对应一种情况：
-                    </p>
-
-                    <div id="rules-container">
-                        <div class="rule-editor">
-                            <div class="rule-field">
-                                <label>如果（条件）</label>
-                                <input type="text" class="rule-condition" placeholder="例如：ROI > 2 且 留存 > 30%">
-                            </div>
-                            <div class="rule-field">
-                                <label>那么属于类别</label>
-                                <input type="text" class="rule-category" placeholder="例如：优质渠道">
-                            </div>
-                            <div class="rule-field">
-                                <label>建议动作</label>
-                                <input type="text" class="rule-action" placeholder="例如：增加预算50%">
-                            </div>
-                            <div class="rule-field">
-                                <label>风险点</label>
-                                <input type="text" class="rule-risk" placeholder="例如：需监控竞品动态">
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="btn add-rule-btn" onclick="addRule()">
-                        ➕ 添加规则
-                    </button>
-
-                    <button class="btn btn-primary" onclick="submitLevel3()" style="width: 100%; margin-top: 20px;">
-                        下一步 ➜
-                    </button>
-                </div>
-            </div>
-
-            <!-- 关卡4 -->
-            <div id="level4" class="hidden">
-                <div class="level-card">
-                    <div class="level-title">
-                        <div class="level-number">4</div>
-                        <h3>封装成AI工具</h3>
-                    </div>
-                    
-                    <p style="margin-bottom: 20px; color: #666;">
-                        🎉 恭喜！所有素材已准备就绪，正在生成您的专属AI提示词...
-                    </p>
-
-                    <div id="generating" class="loading">
-                        <div class="spinner"></div>
-                        <p>AI正在炼金中...</p>
-                    </div>
-
-                    <div id="final-result" class="hidden">
-                        <div class="result-box">
-                            <h4>🎯 您的选题</h4>
-                            <div class="result-content" id="result-topic"></div>
-                        </div>
-
-                        <div class="result-box">
-                            <h4>🧩 决策规则</h4>
-                            <div class="result-content" id="result-rules"></div>
-                        </div>
-
-                        <div class="result-box">
-                            <h4>🤖 AI提示词（可直接复制使用）</h4>
-                            <div class="final-prompt" id="final-prompt-text"></div>
-                        </div>
-
-                        <button class="btn btn-primary copy-btn" onclick="copyPrompt()">
-                            📋 复制提示词
-                        </button>
-
-                        <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px;">
-                            <h4 style="color: #1976d2; margin-bottom: 10px;">💡 接下来您可以：</h4>
-                            <ul style="color: #333; line-height: 2;">
-                                <li>复制提示词到 <strong>Coze/Dify/GPTs</strong> 创建Bot</li>
-                                <li>在 <strong>飞书/企业微信</strong> 上配置机器人</li>
-                                <li>封装成 <strong>API</strong> 供网站调用</li>
-                                <li>作为 <strong>付费咨询</strong> 的替代品</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 加载中 -->
-            <div id="loading" class="loading hidden">
-                <div class="spinner"></div>
-                <p>AI正在思考...</p>
-            </div>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
         </div>
     </div>
 
     <script>
-        let gameData = {
-            mode: '',
+        let sessionData = {
+            sessionId: 'session_' + Date.now(),
             currentLevel: 0,
-            level1: {},
-            level2: {},
-            level3: { rules: [] }
+            level1Complete: false,
+            level2Complete: false,
+            level3Complete: false,
+            level4Complete: false,
+            messages: []
         };
 
-        function startGame(mode) {
-            gameData.mode = mode;
-            document.getElementById('welcome').classList.add('hidden');
-            document.getElementById('progress').classList.remove('hidden');
-            showLevel(1);
+        const API_BASE = window.location.origin;
+
+        function startChat(mode) {
+            document.getElementById('modeSelector').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'flex';
+            document.getElementById('chatContainer').style.display = 'flex';
+            document.getElementById('inputContainer').style.display = 'flex';
+
+            // 让AI先说第一句话
+            sendAIMessage(mode);
         }
 
-        function showLevel(level) {
-            // 隐藏所有关卡
-            for (let i = 1; i <= 4; i++) {
-                document.getElementById('level' + i).classList.add('hidden');
+        function addMessage(content, isUser = false) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="avatar">${isUser ? '👤' : '🔮'}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            sessionData.messages.push({
+                role: isUser ? 'user' : 'assistant',
+                content: content
+            });
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chatContainer');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'message ai';
+            typingDiv.innerHTML = `
+                <div class="avatar">🔮</div>
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        async function sendAIMessage(mode) {
+            showTyping();
+            disableInput();
+
+            try {
+                // 第一次调用，让AI做自我介绍并开始引导
+                const initialPrompt = mode === 'quick' 
+                    ? '用户选择了快速模式，请做自我介绍并开始引导第一关的问题。'
+                    : '用户选择了附件模式，请做自我介绍，并告诉用户可以上传简历等材料。';
+
+                const response = await fetch(`${API_BASE}/alchemist/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: initialPrompt,
+                        session_id: sessionData.sessionId,
+                        start_new: true
+                    })
+                });
+
+                const data = await response.json();
+                hideTyping();
+                
+                if (data.status === 'success') {
+                    addMessage(data.message);
+                    enableInput();
+                } else {
+                    addMessage('抱歉，出现了一些问题，请刷新页面重试。');
+                }
+            } catch (error) {
+                hideTyping();
+                console.error('Error:', error);
+                // 如果API调用失败，使用本地模拟
+                const welcomeMessage = getWelcomeMessage(mode);
+                addMessage(welcomeMessage);
+                enableInput();
             }
+        }
+
+        function getWelcomeMessage(mode) {
+            if (mode === 'quick') {
+                return `🔮 **欢迎来到决策炼金坊！**
+
+我是您的炼金师小智。您的每一次成功决策，都是等待被提炼的黄金！今天，我们将把您脑中的"隐性知识"变成一款能帮别人解决问题的AI工具——甚至可以收费哦！
+
+---
+
+💎 **第一关：锁定宝藏选题**
+
+我们要找的选题，应该满足三个条件：
+✅ 您有独特经验
+✅ 别人有强烈需求  
+✅ 能封装成工具
+
+---
+
+**问题1：您最擅长解决哪类问题？**
+
+可以是工作中经常遇到的，也可以是别人经常向您请教的。请用一句话描述这个场景。
+
+例如：
+- "判断一个新渠道投放是否值得加码"
+- "快速诊断系统故障根因"
+- "评估一个产品功能该不该做"
+
+请告诉我，您最擅长解决什么问题？`;
+            } else {
+                return `🔮 **欢迎来到决策炼金坊！**
+
+我是您的炼金师小智。您的每一次成功决策，都是等待被提炼的黄金！
+
+您选择了附件模式，可以上传您的简历、述职报告或KPI结果，我会帮您从这些材料中挖掘潜在的决策场景。
+
+不过目前这个版本暂时只支持文字描述，您可以直接告诉我您的工作背景和专业领域，我们一起开始决策炼金之旅！
+
+---
+
+**问题1：您最擅长解决哪类问题？**
+
+请告诉我您的工作领域，以及别人最常向您请教的问题是什么？`;
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
             
-            // 显示当前关卡
-            document.getElementById('level' + level).classList.remove('hidden');
+            if (!message) return;
+
+            // 显示用户消息
+            addMessage(message, true);
+            input.value = '';
             
-            // 更新进度条
+            // 禁用输入
+            disableInput();
+            showTyping();
+
+            try {
+                const response = await fetch(`${API_BASE}/alchemist/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionData.sessionId
+                    })
+                });
+
+                const data = await response.json();
+                hideTyping();
+                
+                if (data.status === 'success') {
+                    addMessage(data.message);
+                    
+                    // 检查是否完成某个关卡，更新进度
+                    updateProgress(data.message);
+                } else {
+                    addMessage('抱歉，出现了一些问题，请重试。');
+                }
+            } catch (error) {
+                hideTyping();
+                console.error('Error:', error);
+                // 本地模拟响应
+                const localResponse = getLocalResponse(message);
+                addMessage(localResponse);
+            }
+
+            enableInput();
+            input.focus();
+        }
+
+        function getLocalResponse(userMessage) {
+            // 简单的本地响应逻辑
+            if (userMessage.includes('擅长') || userMessage.includes('问题')) {
+                return `很好！您提到的"${userMessage.substring(0, 50)}..."是一个很好的切入点。
+
+**问题2：谁最需要这个能力？**
+
+描述一下目标用户——他们是什么岗位？什么经验水平？在什么情况下会用到？
+
+例如：
+- "刚入职的投放专员，每天面对数据报表不知道如何调整预算"
+- "产品新人，不知道如何评估需求优先级"
+
+请告诉我，谁最需要您这个能力？`;
+            } else {
+                return `感谢您的回答！您提到的内容很有价值。
+
+让我们继续下一个问题。根据您的描述，我需要了解更多细节才能帮您提炼决策规则。
+
+您能举个具体的例子吗？比如最近一次您做出这个决策时的具体情况。`;
+            }
+        }
+
+        function updateProgress(message) {
+            // 根据消息内容判断当前进度
+            if (message.includes('第二关') || message.includes('关卡2')) {
+                setProgress(2);
+            } else if (message.includes('第三关') || message.includes('关卡3')) {
+                setProgress(3);
+            } else if (message.includes('第四关') || message.includes('关卡4') || message.includes('恭喜')) {
+                setProgress(4);
+            }
+        }
+
+        function setProgress(level) {
             for (let i = 1; i <= 4; i++) {
                 const step = document.getElementById('step' + i);
                 step.classList.remove('active', 'completed');
+                
                 if (i < level) {
                     step.classList.add('completed');
                 } else if (i === level) {
                     step.classList.add('active');
                 }
             }
-            
-            gameData.currentLevel = level;
         }
 
-        async function submitLevel1() {
-            const q1_1 = document.getElementById('q1_1').value.trim();
-            const q1_2 = document.getElementById('q1_2').value.trim();
-            const q1_3 = document.getElementById('q1_3').value.trim();
-
-            if (!q1_1 || !q1_2 || !q1_3) {
-                alert('请填写所有问题');
-                return;
-            }
-
-            gameData.level1 = {
-                expertise: q1_1,
-                targetUser: q1_2,
-                consequences: q1_3
-            };
-
-            showLevel(2);
+        function disableInput() {
+            document.getElementById('userInput').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
         }
 
-        async function submitLevel2() {
-            const q2_1 = document.getElementById('q2_1').value.trim();
-            const q2_2 = document.getElementById('q2_2').value.trim();
-            const q2_3 = document.getElementById('q2_3').value.trim();
-            const q2_4 = document.getElementById('q2_4').value.trim();
-
-            if (!q2_1 || !q2_2 || !q2_3 || !q2_4) {
-                alert('请填写所有问题');
-                return;
-            }
-
-            gameData.level2 = {
-                firstLook: q2_1,
-                criteria: q2_2,
-                turningPoint: q2_3,
-                commonMistakes: q2_4
-            };
-
-            showLevel(3);
+        function enableInput() {
+            document.getElementById('userInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
         }
 
-        function addRule() {
-            const container = document.getElementById('rules-container');
-            const ruleHtml = `
-                <div class="rule-editor">
-                    <div class="rule-field">
-                        <label>如果（条件）</label>
-                        <input type="text" class="rule-condition" placeholder="例如：ROI > 2 且 留存 > 30%">
-                    </div>
-                    <div class="rule-field">
-                        <label>那么属于类别</label>
-                        <input type="text" class="rule-category" placeholder="例如：优质渠道">
-                    </div>
-                    <div class="rule-field">
-                        <label>建议动作</label>
-                        <input type="text" class="rule-action" placeholder="例如：增加预算50%">
-                    </div>
-                    <div class="rule-field">
-                        <label>风险点</label>
-                        <input type="text" class="rule-risk" placeholder="例如：需监控竞品动态">
-                    </div>
-                    <button class="btn remove-rule-btn" onclick="removeRule(this)">删除此规则</button>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', ruleHtml);
-        }
-
-        function removeRule(btn) {
-            btn.parentElement.remove();
-        }
-
-        async function submitLevel3() {
-            const ruleEditors = document.querySelectorAll('.rule-editor');
-            const rules = [];
-
-            ruleEditors.forEach((editor, index) => {
-                const condition = editor.querySelector('.rule-condition').value.trim();
-                const category = editor.querySelector('.rule-category').value.trim();
-                const action = editor.querySelector('.rule-action').value.trim();
-                const risk = editor.querySelector('.rule-risk').value.trim();
-
-                if (condition && category && action) {
-                    rules.push({
-                        condition,
-                        category,
-                        action,
-                        risk: risk || '无明显风险'
-                    });
+        // 回车发送
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('userInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
                 }
             });
+        });
 
-            if (rules.length === 0) {
-                alert('请至少填写一条规则');
-                return;
-            }
-
-            gameData.level3.rules = rules;
-            showLevel(4);
-            await generateFinalPrompt();
-        }
-
-        async function generateFinalPrompt() {
-            // 模拟生成过程
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // 显示结果
-            document.getElementById('generating').classList.add('hidden');
-            document.getElementById('final-result').classList.remove('hidden');
-
-            // 填充选题
-            document.getElementById('result-topic').textContent = 
-                `决策场景：${gameData.level1.expertise}\n\n` +
-                `目标用户：${gameData.level1.targetUser}\n\n` +
-                `核心价值：帮助用户避免${gameData.level1.consequences}`;
-
-            // 填充规则
-            let rulesText = '';
-            gameData.level3.rules.forEach((rule, index) => {
-                rulesText += `规则 ${index + 1}:\n`;
-                rulesText += `  条件：${rule.condition}\n`;
-                rulesText += `  类别：${rule.category}\n`;
-                rulesText += `  动作：${rule.action}\n`;
-                rulesText += `  风险：${rule.risk}\n\n`;
-            });
-            document.getElementById('result-rules').textContent = rulesText;
-
-            // 生成AI提示词
-            const prompt = generatePromptText();
-            document.getElementById('final-prompt-text').textContent = prompt;
-        }
-
-        function generatePromptText() {
-            let rulesText = '';
-            gameData.level3.rules.forEach((rule, index) => {
-                rulesText += `${index + 1}. 如果 ${rule.condition}\n`;
-                rulesText += `   那么 属于类别 "${rule.category}"\n`;
-                rulesText += `   建议动作：${rule.action}\n`;
-                rulesText += `   风险点：${rule.risk}\n\n`;
-            });
-
-            return `# 角色设定
-你是一位资深的决策专家，擅长"${gameData.level1.expertise}"。用户会描述他们遇到的具体情况，你需要基于专家的决策框架，给出判断和行动建议。
-
-# 决策规则
-请严格遵循以下规则进行分析和输出。如果用户提供的信息不足以判断，请礼貌地询问更多细节。
-
-${rulesText}
-# 判断依据
-- 首先关注：${gameData.level2.firstLook}
-- 关键标准：${gameData.level2.criteria}
-- 决策转折信号：${gameData.level2.turningPoint}
-- 常见误区：${gameData.level2.commonMistakes}
-
-# 输出格式
-你的回答必须包含以下四个部分：
-1. **需求分类**：根据规则，将用户的情况归入哪一类
-2. **分析框架**：简要说明你是基于什么标准做出这个判断的
-3. **风险点**：指出在当前情况下可能存在的风险或陷阱
-4. **下一步具体动作**：给出明确的行动建议，包括做什么、怎么做、优先级等
-
-如果用户的问题不在规则覆盖范围内，请说明"当前规则无法覆盖此情况"，并建议用户补充信息或咨询专家。
-
-# 目标用户
-${gameData.level1.targetUser}
-
-# 注意事项
-- 决策失误后果：${gameData.level1.consequences}
-- 请务必提醒用户注意关键风险点
-- 给出可执行、具体化的行动建议`;
+        function showFinalResult(prompt) {
+            const container = document.getElementById('chatContainer');
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result-panel';
+            resultDiv.innerHTML = `
+                <h4>🎉 恭喜！您获得了【完整AI工具提示词】！</h4>
+                <div class="final-prompt-box">${prompt}</div>
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="copyPrompt()">📋 复制提示词</button>
+                    <button class="btn btn-primary" onclick="location.reload()">🔄 重新开始</button>
+                </div>
+            `;
+            
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
         }
 
         function copyPrompt() {
-            const prompt = document.getElementById('final-prompt-text').textContent;
-            navigator.clipboard.writeText(prompt).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                const originalText = btn.textContent;
-                btn.textContent = '✅ 已复制到剪贴板！';
-                btn.style.background = '#4caf50';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                }, 2000);
-            }).catch(err => {
-                alert('复制失败，请手动选择复制');
-            });
+            const promptBox = document.querySelector('.final-prompt-box');
+            if (promptBox) {
+                navigator.clipboard.writeText(promptBox.textContent).then(() => {
+                    alert('✅ 已复制到剪贴板！');
+                }).catch(err => {
+                    alert('复制失败，请手动选择复制');
+                });
+            }
         }
     </script>
 </body>
