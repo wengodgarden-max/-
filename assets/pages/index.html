@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>炼金师助手 - 把你的判断力变成付费AI工具</title>
     <style>
         * {
@@ -12,20 +12,21 @@
         }
 
         body {
-            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
         }
 
         .container {
             width: 100%;
             max-width: 800px;
-            height: 90vh;
-            max-height: 800px;
+            height: 95vh;
+            height: 95dvh;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -37,32 +38,34 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px 30px;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            flex-shrink: 0;
         }
 
         .header-icon {
-            font-size: 40px;
+            font-size: 32px;
         }
 
         .header-text h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
+            font-size: 20px;
+            margin-bottom: 3px;
         }
 
         .header-text p {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.9;
         }
 
         .progress-bar {
             display: flex;
             justify-content: space-between;
-            padding: 20px 30px;
+            padding: 15px 20px;
             background: #f8f9fa;
             border-bottom: 1px solid #e0e0e0;
+            flex-shrink: 0;
         }
 
         .progress-step {
@@ -73,8 +76,8 @@
         }
 
         .progress-circle {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: #e0e0e0;
             color: #999;
@@ -83,7 +86,7 @@
             justify-content: center;
             font-weight: bold;
             font-size: 14px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             transition: all 0.3s;
         }
 
@@ -98,7 +101,7 @@
         }
 
         .progress-label {
-            font-size: 11px;
+            font-size: 10px;
             color: #999;
             text-align: center;
         }
@@ -106,16 +109,17 @@
         .chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .message {
             display: flex;
-            gap: 12px;
-            max-width: 85%;
+            gap: 10px;
+            max-width: 90%;
             animation: fadeIn 0.3s ease-in;
         }
 
@@ -136,13 +140,13 @@
         }
 
         .avatar {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             flex-shrink: 0;
         }
 
@@ -155,9 +159,9 @@
         }
 
         .message-content {
-            padding: 15px 18px;
-            border-radius: 18px;
-            line-height: 1.8;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.7;
             font-size: 15px;
         }
 
@@ -172,20 +176,20 @@
         }
 
         .message-content ul {
-            margin: 10px 0;
-            padding-left: 20px;
+            margin: 8px 0;
+            padding-left: 18px;
         }
 
         .message-content li {
-            margin: 8px 0;
+            margin: 6px 0;
         }
 
         .typing-indicator {
             display: flex;
-            gap: 5px;
-            padding: 15px 18px;
+            gap: 4px;
+            padding: 12px 16px;
             background: #f0f4ff;
-            border-radius: 18px;
+            border-radius: 16px;
             width: fit-content;
         }
 
@@ -210,22 +214,24 @@
                 transform: translateY(0);
             }
             30% {
-                transform: translateY(-8px);
+                transform: translateY(-6px);
             }
         }
 
         .input-container {
-            padding: 20px;
+            padding: 12px 15px;
             background: white;
             border-top: 1px solid #e0e0e0;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .input-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            align-items: flex-end;
         }
 
         .input-wrapper {
@@ -235,13 +241,16 @@
 
         #userInput {
             width: 100%;
-            padding: 15px 20px;
+            padding: 12px 16px;
             border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 15px;
+            border-radius: 22px;
+            font-size: 16px;
             font-family: inherit;
             outline: none;
             transition: border-color 0.3s;
+            resize: none;
+            max-height: 100px;
+            min-height: 44px;
         }
 
         #userInput:focus {
@@ -250,6 +259,45 @@
 
         #userInput:disabled {
             background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .voice-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .voice-btn.recording {
+            background: #f44336;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .voice-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .voice-btn:disabled {
+            background: #e0e0e0;
             cursor: not-allowed;
         }
 
@@ -266,10 +314,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .send-btn:hover:not(:disabled) {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .send-btn:disabled {
@@ -279,21 +328,25 @@
 
         .mode-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
-            margin-top: 15px;
+            margin-top: 12px;
+            flex-wrap: wrap;
         }
 
         .mode-btn {
-            padding: 15px 30px;
+            padding: 12px 24px;
             border: 2px solid #667eea;
             border-radius: 12px;
             background: white;
             color: #667eea;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .mode-btn:hover {
@@ -306,15 +359,44 @@
             display: none !important;
         }
 
+        .voice-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            padding: 5px;
+        }
+
+        .voice-hint.recording {
+            color: #f44336;
+            font-weight: bold;
+        }
+
         @media (max-width: 600px) {
             .container {
                 height: 100vh;
+                height: 100dvh;
                 max-height: none;
                 border-radius: 0;
             }
             
             .mode-buttons {
                 flex-direction: column;
+            }
+            
+            .mode-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-text h1 {
+                font-size: 18px;
+            }
+        }
+
+        /* 安全区域适配 */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .input-container {
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
             }
         }
     </style>
@@ -353,11 +435,17 @@
 
         <!-- 输入区域 -->
         <div id="inputContainer" class="input-container hidden">
+            <div class="voice-hint" id="voiceHint">按住语音按钮说话，松开发送</div>
             <div class="input-row">
+                <button class="voice-btn" id="voiceBtn" ontouchstart="startRecording(event)" ontouchend="stopRecording(event)" onmousedown="startRecording(event)" onmouseup="stopRecording(event)">
+                    🎤
+                </button>
                 <div class="input-wrapper">
-                    <input type="text" id="userInput" placeholder="输入您的回答..." />
+                    <input type="text" id="userInput" placeholder="输入或语音输入..." autocomplete="off" />
                 </div>
-                <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    ➤
+                </button>
             </div>
         </div>
     </div>
@@ -370,12 +458,89 @@
             messages: []
         };
 
+        // 获取当前页面的主机地址
         const API_BASE = window.location.origin;
+
+        // 语音识别相关
+        let recognition = null;
+        let isRecording = false;
+        let finalTranscript = '';
 
         // 页面加载后，AI先打招呼
         window.onload = function() {
+            initSpeechRecognition();
             showWelcomeMessage();
         };
+
+        // 初始化语音识别
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'zh-CN';
+
+                recognition.onstart = function() {
+                    isRecording = true;
+                    document.getElementById('voiceBtn').classList.add('recording');
+                    document.getElementById('voiceHint').textContent = '正在聆听...';
+                    document.getElementById('voiceHint').classList.add('recording');
+                };
+
+                recognition.onresult = function(event) {
+                    let interimTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    document.getElementById('userInput').value = finalTranscript + interimTranscript;
+                };
+
+                recognition.onend = function() {
+                    isRecording = false;
+                    document.getElementById('voiceBtn').classList.remove('recording');
+                    document.getElementById('voiceHint').textContent = '按住语音按钮说话，松开发送';
+                    document.getElementById('voiceHint').classList.remove('recording');
+                    
+                    // 如果有内容，自动发送
+                    if (finalTranscript.trim()) {
+                        sendMessage();
+                        finalTranscript = '';
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    isRecording = false;
+                    document.getElementById('voiceBtn').classList.remove('recording');
+                    document.getElementById('voiceHint').textContent = '语音识别出错，请重试';
+                    document.getElementById('voiceHint').classList.remove('recording');
+                    finalTranscript = '';
+                };
+            } else {
+                document.getElementById('voiceHint').textContent = '您的浏览器不支持语音输入';
+                document.getElementById('voiceBtn').disabled = true;
+            }
+        }
+
+        function startRecording(event) {
+            event.preventDefault();
+            if (recognition && !isRecording) {
+                finalTranscript = '';
+                recognition.start();
+            }
+        }
+
+        function stopRecording(event) {
+            event.preventDefault();
+            if (recognition && isRecording) {
+                recognition.stop();
+            }
+        }
 
         function showWelcomeMessage() {
             const welcomeMessage = `🔮 **欢迎来到炼金坊！**
@@ -408,7 +573,7 @@
             buttonsDiv.className = 'message ai';
             buttonsDiv.innerHTML = `
                 <div class="avatar">🔮</div>
-                <div class="mode-buttons" style="background: #f0f4ff; padding: 15px; border-radius: 18px;">
+                <div class="mode-buttons" style="background: #f0f4ff; padding: 12px; border-radius: 16px;">
                     <button class="mode-btn" onclick="selectMode('quick')">🚀 快速模式</button>
                     <button class="mode-btn" onclick="selectMode('assisted')">📎 附件模式</button>
                 </div>
@@ -524,7 +689,6 @@
             } catch (error) {
                 hideTyping();
                 console.error('Error:', error);
-                // 如果API调用失败，使用本地模拟
                 const localMessage = getLocalFirstQuestion(mode);
                 addMessage(localMessage);
                 enableInput();
@@ -573,6 +737,7 @@
             // 显示用户消息
             addMessage(message, true);
             input.value = '';
+            finalTranscript = '';
             
             // 禁用输入
             disableInput();
@@ -603,7 +768,6 @@
             } catch (error) {
                 hideTyping();
                 console.error('Error:', error);
-                // 本地模拟响应
                 const localResponse = getLocalResponse(message);
                 addMessage(localResponse);
             }
@@ -626,24 +790,17 @@
 - 您在项目中的角色
 - 取得了什么成果（最好有数据）
 
-例如：
-- "搭建会员体系，用户7日留存提升25%，付费率提升15%"
-
 请告诉我您的成就！`;
                 } else if (msg.includes('项目') || msg.includes('提升') || msg.includes('完成')) {
                     return `非常棒的成就！🎯
 
 **问题3：您最常被请教的问题是什么？**
 
-回想一下，同事或朋友经常向您请教哪类问题？
-- 他们遇到什么困难时会想到您？
-- 这些问题通常涉及什么场景？`;
+回想一下，同事或朋友经常向您请教哪类问题？`;
                 } else {
-                    return `感谢您的分享！这些信息很有价值。
+                    return `感谢您的分享！
 
-根据您提供的信息，我帮您提炼一下潜在的决策场景：
-
-您可能擅长某个领域的决策判断。请告诉我：
+根据您提供的信息，您可能擅长某个领域的决策判断。请告诉我：
 
 您一眼就能看穿、别人却觉得复杂的问题是什么？`;
                 }
@@ -653,26 +810,18 @@
 
 **问题2：谁最需要这个能力？**
 
-描述一下目标用户：
-- 他们是什么岗位？
-- 什么经验水平？
-- 在什么情况下会用到这个能力？
-
-请告诉我，谁最需要您这个能力？`;
+描述一下目标用户：岗位、经验水平、使用场景。`;
                 } else {
                     return `感谢您的回答！
 
 **问题3：如果他们判断失误，会有什么后果？**
 
-这个决策失误会造成什么损失？这能帮助我们验证这个场景的价值。
-
-请告诉我，判断失误的后果是什么？`;
+这个决策失误会造成什么损失？`;
                 }
             }
         }
 
         function updateProgress(message) {
-            // 根据消息内容判断当前进度
             if (message.includes('第二关') || message.includes('关卡2')) {
                 setProgress(2);
             } else if (message.includes('第三关') || message.includes('关卡3')) {
@@ -698,11 +847,13 @@
         function disableInput() {
             document.getElementById('userInput').disabled = true;
             document.getElementById('sendBtn').disabled = true;
+            document.getElementById('voiceBtn').disabled = true;
         }
 
         function enableInput() {
             document.getElementById('userInput').disabled = false;
             document.getElementById('sendBtn').disabled = false;
+            document.getElementById('voiceBtn').disabled = false;
         }
 
         // 回车发送
