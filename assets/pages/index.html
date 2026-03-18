@@ -541,6 +541,71 @@
             margin: 6px 0;
         }
 
+        .message-content .check-li {
+            list-style: none;
+            margin-left: -18px;
+        }
+
+        /* Markdown 表格样式 */
+        .message-content .md-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 14px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .message-content .md-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message-content .md-table th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .message-content .md-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .message-content .md-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .message-content .md-table tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        /* Markdown 标题样式 */
+        .message-content .md-h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 16px 0 10px 0;
+            color: var(--primary-color);
+        }
+
+        .message-content .md-h3 {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 14px 0 8px 0;
+            color: var(--text-dark);
+        }
+
+        .message-content .md-h4 {
+            font-size: 15px;
+            font-weight: bold;
+            margin: 12px 0 6px 0;
+            color: var(--text-dark);
+        }
+
         /* Prompt输出框 */
         .prompt-output {
             background: #1e1e1e;
@@ -1801,12 +1866,58 @@
 
         // 格式化消息
         function formatMessage(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n\n/g, '</p><p>')
-                .replace(/\n/g, '<br>')
-                .replace(/^/, '<p>')
-                .replace(/$/, '</p>');
+            // 先处理表格（必须在其他处理之前）
+            let result = text;
+            
+            // 匹配Markdown表格
+            const tableRegex = /\|(.+)\|\n\|[-\s|:]+\|\n((?:\|.+\|\n?)+)/g;
+            result = result.replace(tableRegex, function(match, headerRow, bodyRows) {
+                // 解析表头
+                const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
+                let tableHtml = '<table class="md-table"><thead><tr>';
+                headers.forEach(h => {
+                    tableHtml += `<th>${h}</th>`;
+                });
+                tableHtml += '</tr></thead><tbody>';
+                
+                // 解析表格内容
+                const rows = bodyRows.trim().split('\n');
+                rows.forEach(row => {
+                    const cells = row.split('|').map(c => c.trim()).filter(c => c);
+                    if (cells.length > 0) {
+                        tableHtml += '<tr>';
+                        cells.forEach(cell => {
+                            tableHtml += `<td>${cell}</td>`;
+                        });
+                        tableHtml += '</tr>';
+                    }
+                });
+                tableHtml += '</tbody></table>';
+                return tableHtml;
+            });
+            
+            // 处理标题
+            result = result.replace(/^### (.*$)/gm, '<h4 class="md-h4">$1</h4>');
+            result = result.replace(/^## (.*$)/gm, '<h3 class="md-h3">$1</h3>');
+            result = result.replace(/^# (.*$)/gm, '<h2 class="md-h2">$1</h2>');
+            
+            // 处理粗体
+            result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // 处理列表
+            result = result.replace(/^\- (.*$)/gm, '<li>$1</li>');
+            result = result.replace(/^✅ (.*$)/gm, '<li class="check-li">✅ $1</li>');
+            
+            // 处理换行
+            result = result.replace(/\n\n/g, '</p><p>');
+            result = result.replace(/\n/g, '<br>');
+            
+            // 包装段落
+            if (!result.startsWith('<')) {
+                result = '<p>' + result + '</p>';
+            }
+            
+            return result;
         }
 
         // 显示输入中
