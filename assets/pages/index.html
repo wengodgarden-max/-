@@ -1466,60 +1466,27 @@
 
 ---
 
-## 📦 请选择您想要的产出物
+⏱️ **全程大约 20-30 分钟，分为三个阶段：**
 
-| 模式 | 产出物 | 适用场景 |
-|------|--------|---------|
-| 🤖 **做Agent** | AI提示词 + Skill插件 | 让用户带上您的技能马上应用 |
-| 📚 **做课程** | 课程大纲 + PPT | 拿上就能走上讲台 |
-
----
-
-## ⏱️ 全程大约 20-30 分钟
-
-您可以选择：
-
-⚡ **快速模式**：直接回答几个问题（适合思路清晰的专家）
-
-📎 **附件模式**：上传您的简历、述职报告或KPI结果，我来帮您挖掘潜在选题
+📌 **阶段一：盘点知识资产** → 找到您能讲什么
+📌 **阶段二：评估选题价值** → 选出最值得做的
+📌 **阶段三：产出最终产品** → Agent 或 课程
 
 ---
 
-## 💡 这个过程会帮您：
+📦 **最终产出物：**
 
-**做Agent模式：**
-✅ 找到您最擅长、最有价值的决策场景
-✅ 拆解您的思考过程，让它变得可复制
-✅ 把经验变成清晰的实操方法论
-✅ 生成可以直接使用的AI提示词，让您调试自己的Agent
+🤖 **做Agent** → AI提示词 + Skill插件，让用户带上您的技能马上应用
 
-**做课程模式：**
-✅ 明确目标学员和课程定位
-✅ 萃取您的工作步骤、方法工具、挑战窍门
-✅ 设计结构化的课程大纲
-✅ 生成上课用的PPT和课程大纲，让您立刻就能走上讲台`;
+📚 **做课程** → 课程大纲 + PPT，拿上就能走上讲台
+
+---
+
+💡 **准备好了吗？让我们从盘点您的知识资产开始！**
+
+请告诉我：**您目前的工作岗位是什么？在这份工作中主要负责什么？**`;
 
             addMessage(welcomeMessage);
-            showMainModeButtons();
-        }
-
-        // 显示主模式选择按钮（Agent/课程）
-        function showMainModeButtons() {
-            const container = document.getElementById('chatContainer');
-            
-            const buttonsDiv = document.createElement('div');
-            buttonsDiv.id = 'modeButtonsDiv';
-            buttonsDiv.className = 'message ai';
-            buttonsDiv.innerHTML = `
-                <div class="avatar">🔮</div>
-                <div class="mode-buttons" style="background: #f0f4ff; padding: 12px; border-radius: 16px;">
-                    <button class="mode-btn" onclick="selectMainMode('agent')">🤖 做一个Agent</button>
-                    <button class="mode-btn" onclick="selectMainMode('course')">📚 做一门课程</button>
-                </div>
-            `;
-            
-            container.appendChild(buttonsDiv);
-            container.scrollTop = container.scrollHeight;
         }
 
         // 选择主模式（Agent/课程）
