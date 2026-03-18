@@ -35,204 +35,150 @@
 
         .app-container {
             display: flex;
+            flex-direction: column;
             width: 100%;
             height: 100vh;
             height: 100dvh;
         }
 
-        /* 左侧功能栏 */
-        .sidebar {
-            width: 300px;
+        /* 底部导航栏 */
+        .bottom-nav {
+            display: flex;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
-            position: relative;
-            z-index: 100;
-            border-right: 1px solid var(--border-color);
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-        }
-
-        .sidebar-header {
-            padding: 15px 20px;
-            background: var(--primary-gradient);
-            color: white;
-        }
-
-        .sidebar-header h2 {
-            font-size: 16px;
-            margin-bottom: 3px;
-        }
-
-        .sidebar-header p {
-            font-size: 11px;
-            opacity: 0.9;
-        }
-
-        /* 分页标签 */
-        .sidebar-tabs {
-            display: flex;
-            background: var(--bg-light);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .sidebar-tab {
-            flex: 1;
-            padding: 12px 10px;
-            border: none;
-            background: none;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-gray);
+            align-items: center;
+            padding: 8px 4px;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
+            border: none;
+            background: none;
+            color: var(--text-gray);
         }
 
-        .sidebar-tab:hover {
-            background: rgba(102, 126, 234, 0.1);
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.05);
         }
 
-        .sidebar-tab.active {
+        .nav-item.active {
             color: var(--primary-color);
-            background: white;
         }
 
-        .sidebar-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20%;
-            right: 20%;
-            height: 2px;
-            background: var(--primary-gradient);
-            border-radius: 1px;
+        .nav-item-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
         }
 
-        .sidebar-tab .tab-icon {
-            margin-right: 5px;
+        .nav-item-label {
+            font-size: 11px;
+            font-weight: 500;
         }
 
-        .sidebar-tab .tab-badge {
-            display: inline-block;
-            background: var(--danger-color);
-            color: white;
-            font-size: 10px;
-            padding: 1px 5px;
-            border-radius: 10px;
-            margin-left: 5px;
+        .nav-item.active .nav-item-icon {
+            transform: scale(1.1);
         }
 
-        .sidebar-content {
+        /* 页面容器 */
+        .page-view {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .page-view.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 数据页面通用样式 */
+        .data-page {
             flex: 1;
             overflow-y: auto;
             padding: 15px;
+            padding-bottom: 80px;
         }
 
-        /* 分页内容 */
-        .tab-panel {
-            display: none;
+        .data-page-header {
+            text-align: center;
+            padding: 20px;
+            color: white;
         }
 
-        .tab-panel.active {
-            display: block;
+        .data-page-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
         }
 
-        .stats-section {
-            margin-bottom: 18px;
+        .data-page-header p {
+            font-size: 13px;
+            opacity: 0.9;
         }
 
-        .stats-section-title {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .stat-card {
+        /* 数据卡片 */
+        .data-card {
             background: white;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .stat-card-header {
+        .data-card-title {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 12px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            gap: 6px;
         }
 
-        .stat-card-icon {
+        .data-card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .data-item {
+            text-align: center;
+            padding: 12px 8px;
+            background: var(--bg-light);
+            border-radius: 12px;
+        }
+
+        .data-item-value {
             font-size: 22px;
-        }
-
-        .stat-card-trend {
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .stat-card-trend.up {
-            background: rgba(76, 175, 80, 0.1);
-            color: var(--success-color);
-        }
-
-        .stat-card-trend.down {
-            background: rgba(244, 67, 54, 0.1);
-            color: var(--danger-color);
-        }
-
-        .stat-card-value {
-            font-size: 26px;
             font-weight: bold;
             color: var(--text-dark);
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
-        .stat-card-label {
+        .data-item-label {
             font-size: 11px;
             color: var(--text-gray);
         }
 
-        .stat-card-sub {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .stat-card-sub-item {
-            flex: 1;
-        }
-
-        .stat-card-sub-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .stat-card-sub-label {
-            font-size: 10px;
-            color: var(--text-light);
-        }
-
         /* 漏斗图 */
+        .funnel-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
         .funnel-item {
             margin-bottom: 12px;
         }
@@ -272,95 +218,92 @@
         .funnel-fill.stage-3 { background: var(--warning-color); }
         .funnel-fill.stage-4 { background: var(--danger-color); }
 
-        /* 专家产出列表 */
-        .ai-tool-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .ai-tool-card {
+        /* AI工具卡片 */
+        .tool-card {
             background: white;
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             transition: all 0.3s;
         }
 
-        .ai-tool-card:hover {
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-            border-color: var(--primary-color);
+        .tool-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
         }
 
-        .ai-tool-header {
+        .tool-card-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        .ai-tool-icon {
-            font-size: 20px;
+        .tool-card-icon {
+            font-size: 28px;
         }
 
-        .ai-tool-name {
-            font-size: 14px;
+        .tool-card-name {
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-dark);
             flex: 1;
         }
 
-        .ai-tool-status {
+        .tool-card-status {
             font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
+            padding: 3px 8px;
+            border-radius: 10px;
         }
 
-        .ai-tool-status.active {
+        .tool-card-status.active {
             background: rgba(76, 175, 80, 0.1);
             color: var(--success-color);
         }
 
-        .ai-tool-status.draft {
-            background: rgba(255, 152, 0, 0.1);
-            color: var(--warning-color);
-        }
-
-        .ai-tool-desc {
-            font-size: 11px;
+        .tool-card-desc {
+            font-size: 13px;
             color: var(--text-gray);
-            margin-bottom: 8px;
-            line-height: 1.4;
+            line-height: 1.5;
+            margin-bottom: 12px;
         }
 
-        .ai-tool-stats {
+        .tool-card-stats {
             display: flex;
-            gap: 12px;
-            font-size: 11px;
+            gap: 16px;
+            font-size: 12px;
             color: var(--text-light);
         }
 
-        .ai-tool-stats span {
+        .tool-card-stats span {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
         }
 
         /* 空状态 */
         .empty-state {
             text-align: center;
-            padding: 30px 20px;
-            color: var(--text-light);
+            padding: 40px 20px;
+            color: white;
         }
 
         .empty-state-icon {
             font-size: 48px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .empty-state-text {
-            font-size: 13px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .empty-state-hint {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 8px;
         }
 
         /* 主内容区 */
@@ -369,6 +312,7 @@
             display: flex;
             flex-direction: column;
             min-width: 0;
+            padding-bottom: 60px;
         }
 
         /* 顶部导航 */
@@ -900,176 +844,9 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 左侧功能栏 -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2>📊 功能中心</h2>
-                <p>数据概览与工具管理</p>
-            </div>
-            
-            <!-- 分页标签 -->
-            <div class="sidebar-tabs">
-                <button class="sidebar-tab active" onclick="switchSidebarTab('platform')">
-                    <span class="tab-icon">📈</span>平台数据
-                </button>
-                <button class="sidebar-tab" onclick="switchSidebarTab('expert')">
-                    <span class="tab-icon">🤖</span>我的产出
-                    <span class="tab-badge" id="toolCount">0</span>
-                </button>
-            </div>
-            
-            <div class="sidebar-content">
-                <!-- 平台运营数据 -->
-                <div class="tab-panel active" id="platformPanel">
-                    <!-- 核心指标 -->
-                    <div class="stats-section">
-                        <div class="stats-section-title">📊 核心指标</div>
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <span class="stat-card-icon">👁️</span>
-                                <span class="stat-card-trend up">+12.5%</span>
-                            </div>
-                            <div class="stat-card-value" id="totalVisits">1,234</div>
-                            <div class="stat-card-label">总访问量</div>
-                            <div class="stat-card-sub">
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="todayVisits">89</div>
-                                    <div class="stat-card-sub-label">今日访问</div>
-                                </div>
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="weekVisits">456</div>
-                                    <div class="stat-card-sub-label">本周访问</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <span class="stat-card-icon">👥</span>
-                                <span class="stat-card-trend up">+8.3%</span>
-                            </div>
-                            <div class="stat-card-value" id="totalUsers">567</div>
-                            <div class="stat-card-label">访问人数</div>
-                            <div class="stat-card-sub">
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="todayUsers">23</div>
-                                    <div class="stat-card-sub-label">今日新增</div>
-                                </div>
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="returningUsers">189</div>
-                                    <div class="stat-card-sub-label">回访用户</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <span class="stat-card-icon">🤖</span>
-                                <span class="stat-card-trend up">+15.2%</span>
-                            </div>
-                            <div class="stat-card-value" id="totalOutputs">89</div>
-                            <div class="stat-card-label">产出工具数</div>
-                            <div class="stat-card-sub">
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="todayOutputs">5</div>
-                                    <div class="stat-card-sub-label">今日产出</div>
-                                </div>
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="avgRules">4.2</div>
-                                    <div class="stat-card-sub-label">平均规则数</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 转化漏斗 -->
-                    <div class="stats-section">
-                        <div class="stats-section-title">🔄 转化漏斗</div>
-                        <div class="stat-card">
-                            <div class="funnel-item">
-                                <div class="funnel-header">
-                                    <span class="funnel-label">开始炼金</span>
-                                    <span class="funnel-value" id="funnelStart">456</span>
-                                </div>
-                                <div class="funnel-bar">
-                                    <div class="funnel-fill stage-1" style="width: 100%"></div>
-                                </div>
-                            </div>
-                            <div class="funnel-item">
-                                <div class="funnel-header">
-                                    <span class="funnel-label">完成选题</span>
-                                    <span class="funnel-value" id="funnelTopic">234</span>
-                                </div>
-                                <div class="funnel-bar">
-                                    <div class="funnel-fill stage-2" style="width: 51%"></div>
-                                </div>
-                            </div>
-                            <div class="funnel-item">
-                                <div class="funnel-header">
-                                    <span class="funnel-label">完成规则</span>
-                                    <span class="funnel-value" id="funnelRules">156</span>
-                                </div>
-                                <div class="funnel-bar">
-                                    <div class="funnel-fill stage-3" style="width: 34%"></div>
-                                </div>
-                            </div>
-                            <div class="funnel-item">
-                                <div class="funnel-header">
-                                    <span class="funnel-label">产出工具</span>
-                                    <span class="funnel-value" id="funnelOutput">89</span>
-                                </div>
-                                <div class="funnel-bar">
-                                    <div class="funnel-fill stage-4" style="width: 19%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 商业化指标 -->
-                    <div class="stats-section">
-                        <div class="stats-section-title">💰 商业化指标</div>
-                        <div class="stat-card">
-                            <div class="stat-card-sub" style="border: none; padding-top: 0;">
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="rewardRate">32%</div>
-                                    <div class="stat-card-sub-label">打赏开通率</div>
-                                </div>
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="shareRate">18%</div>
-                                    <div class="stat-card-sub-label">分享率</div>
-                                </div>
-                            </div>
-                            <div class="stat-card-sub">
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="avgTime">12.5</div>
-                                    <div class="stat-card-sub-label">平均用时(分钟)</div>
-                                </div>
-                                <div class="stat-card-sub-item">
-                                    <div class="stat-card-sub-value" id="completeRate">19.5%</div>
-                                    <div class="stat-card-sub-label">完成率</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 专家产出数据 -->
-                <div class="tab-panel" id="expertPanel">
-                    <div class="stats-section">
-                        <div class="stats-section-title">🤖 我的AI工具</div>
-                        <div class="ai-tool-list" id="aiToolList">
-                            <!-- 动态加载 -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- 遮罩层 -->
-        <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-        <!-- 主内容区 -->
-        <main class="main-content">
+        <!-- 炼金助手主页 -->
+        <div class="page-view active" id="homePage">
+            <main class="main-content">
             <!-- 顶部导航 -->
             <nav class="top-nav">
                 <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
@@ -1143,6 +920,141 @@
                 </div>
             </div>
         </main>
+        </div>
+
+        <!-- 平台数据页 -->
+        <div class="page-view" id="platformPage">
+            <div class="data-page">
+                <div class="data-page-header">
+                    <h1>📊 平台数据</h1>
+                    <p>整体运营数据概览</p>
+                </div>
+
+                <!-- 核心指标 -->
+                <div class="data-card">
+                    <div class="data-card-title">📊 核心指标</div>
+                    <div class="data-card-grid">
+                        <div class="data-item">
+                            <div class="data-item-value" id="p_totalVisits">0</div>
+                            <div class="data-item-label">总访问量</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-item-value" id="p_todayVisits">0</div>
+                            <div class="data-item-label">今日访问</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-item-value" id="p_totalUsers">0</div>
+                            <div class="data-item-label">访问人数</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-item-value" id="p_todayUsers">0</div>
+                            <div class="data-item-label">今日新增</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 产出统计 -->
+                <div class="data-card">
+                    <div class="data-card-title">🤖 产出统计</div>
+                    <div class="data-card-grid">
+                        <div class="data-item">
+                            <div class="data-item-value" id="p_totalOutputs">0</div>
+                            <div class="data-item-label">产出工具数</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-item-value" id="p_todayOutputs">0</div>
+                            <div class="data-item-label">今日产出</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 转化漏斗 -->
+                <div class="funnel-card">
+                    <div class="data-card-title">🔄 转化漏斗</div>
+                    <div class="funnel-item">
+                        <div class="funnel-header">
+                            <span class="funnel-label">开始炼金</span>
+                            <span class="funnel-value" id="p_funnelStart">0</span>
+                        </div>
+                        <div class="funnel-bar">
+                            <div class="funnel-fill stage-1" id="p_funnelStartBar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="funnel-item">
+                        <div class="funnel-header">
+                            <span class="funnel-label">完成选题</span>
+                            <span class="funnel-value" id="p_funnelTopic">0</span>
+                        </div>
+                        <div class="funnel-bar">
+                            <div class="funnel-fill stage-2" id="p_funnelTopicBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="funnel-item">
+                        <div class="funnel-header">
+                            <span class="funnel-label">完成规则</span>
+                            <span class="funnel-value" id="p_funnelRules">0</span>
+                        </div>
+                        <div class="funnel-bar">
+                            <div class="funnel-fill stage-3" id="p_funnelRulesBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="funnel-item">
+                        <div class="funnel-header">
+                            <span class="funnel-label">产出工具</span>
+                            <span class="funnel-value" id="p_funnelOutput">0</span>
+                        </div>
+                        <div class="funnel-bar">
+                            <div class="funnel-fill stage-4" id="p_funnelOutputBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 商业化指标 -->
+                <div class="data-card">
+                    <div class="data-card-title">💰 商业化指标</div>
+                    <div class="data-card-grid">
+                        <div class="data-item">
+                            <div class="data-item-value" id="p_rewardRate">0%</div>
+                            <div class="data-item-label">打赏开通率</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-item-value" id="p_completeRate">0%</div>
+                            <div class="data-item-label">完成率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 我的作品页 -->
+        <div class="page-view" id="myWorksPage">
+            <div class="data-page">
+                <div class="data-page-header">
+                    <h1>🤖 我的作品</h1>
+                    <p>您创建的AI决策工具</p>
+                </div>
+
+                <div id="myToolsContainer">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航栏 -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchPage('home')">
+                <span class="nav-item-icon">🧪</span>
+                <span class="nav-item-label">炼金助手</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('platform')">
+                <span class="nav-item-icon">📊</span>
+                <span class="nav-item-label">平台数据</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('myworks')">
+                <span class="nav-item-icon">🤖</span>
+                <span class="nav-item-label">我的作品</span>
+            </button>
+        </nav>
     </div>
 
     <script>
@@ -1179,13 +1091,100 @@
             trackVisit();
         };
 
-        // 切换侧边栏分页
-        function switchSidebarTab(tab) {
-            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        // 切换页面
+        function switchPage(page) {
+            // 更新导航按钮状态
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
             
-            event.target.closest('.sidebar-tab').classList.add('active');
-            document.getElementById(tab + 'Panel').classList.add('active');
+            // 隐藏所有页面
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            
+            // 显示对应页面
+            if (page === 'home') {
+                document.getElementById('homePage').classList.add('active');
+            } else if (page === 'platform') {
+                document.getElementById('platformPage').classList.add('active');
+                loadPlatformData();
+            } else if (page === 'myworks') {
+                document.getElementById('myWorksPage').classList.add('active');
+                loadMyWorks();
+            }
+        }
+
+        // 加载平台数据
+        function loadPlatformData() {
+            fetch('/api/stats/data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) return;
+                    
+                    // 更新核心指标
+                    document.getElementById('p_totalVisits').textContent = formatNumber(data.totalVisits);
+                    document.getElementById('p_todayVisits').textContent = formatNumber(data.todayVisits);
+                    document.getElementById('p_totalUsers').textContent = formatNumber(data.totalUsers);
+                    document.getElementById('p_todayUsers').textContent = formatNumber(data.todayUsers);
+                    document.getElementById('p_totalOutputs').textContent = formatNumber(data.totalOutputs);
+                    document.getElementById('p_todayOutputs').textContent = formatNumber(data.todayOutputs);
+                    
+                    // 更新漏斗
+                    const total = Math.max(data.funnelStart, 1);
+                    document.getElementById('p_funnelStart').textContent = formatNumber(data.funnelStart);
+                    document.getElementById('p_funnelTopic').textContent = formatNumber(data.funnelTopic);
+                    document.getElementById('p_funnelRules').textContent = formatNumber(data.funnelRules);
+                    document.getElementById('p_funnelOutput').textContent = formatNumber(data.funnelOutput);
+                    
+                    document.getElementById('p_funnelTopicBar').style.width = Math.round(data.funnelTopic / total * 100) + '%';
+                    document.getElementById('p_funnelRulesBar').style.width = Math.round(data.funnelRules / total * 100) + '%';
+                    document.getElementById('p_funnelOutputBar').style.width = Math.round(data.funnelOutput / total * 100) + '%';
+                    
+                    // 更新商业化指标
+                    document.getElementById('p_rewardRate').textContent = data.rewardRate + '%';
+                    document.getElementById('p_completeRate').textContent = data.completeRate + '%';
+                })
+                .catch(e => console.log('Load platform data error:', e));
+        }
+
+        // 加载我的作品
+        function loadMyWorks() {
+            const tools = JSON.parse(localStorage.getItem('myAITools') || '[]');
+            const container = document.getElementById('myToolsContainer');
+            
+            if (tools.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🤖</div>
+                        <div class="empty-state-text">还没有创建任何AI工具</div>
+                        <div class="empty-state-hint">点击"炼金助手"开始创建您的第一个AI决策工具</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = tools.map((tool, index) => `
+                <div class="tool-card" onclick="viewTool(${index})">
+                    <div class="tool-card-header">
+                        <span class="tool-card-icon">${tool.icon || '🤖'}</span>
+                        <span class="tool-card-name">${tool.name}</span>
+                        <span class="tool-card-status active">已发布</span>
+                    </div>
+                    <div class="tool-card-desc">${tool.description || '暂无描述'}</div>
+                    <div class="tool-card-stats">
+                        <span>📅 ${tool.createTime || '刚刚'}</span>
+                        <span>📋 ${tool.ruleCount || 0}条规则</span>
+                        <span>👁️ ${tool.views || 0}次使用</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 查看工具详情
+        function viewTool(index) {
+            const tools = JSON.parse(localStorage.getItem('myAITools') || '[]');
+            const tool = tools[index];
+            if (tool && tool.prompt) {
+                alert('AI工具提示词：\n\n' + tool.prompt);
+            }
         }
 
         // 加载我的工具列表
