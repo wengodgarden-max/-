@@ -1460,26 +1460,28 @@
         function showWelcomeMessage() {
             const welcomeMessage = `🔮 **欢迎来到炼金师助手！**
 
-我是炼金师小智。您的每一次成功决策，都是等待被提炼的黄金。今天，我们将把您脑中的 "隐性知识" 变成一款能帮别人解决问题的 Agent —— 甚至可以收费哦！
+我是炼金师小智。您的每一次成功决策、每一条宝贵经验，都是等待被提炼的黄金。
 
-全程大约 20-30 分钟。您可以选择：
+今天，我可以帮您实现以下目标：
 
-⚡ **快速模式**：直接回答几个问题（适合思路清晰的专家）
+**请选择您的目标模式：**
 
-📎 **附件模式**：上传您的简历、述职报告或 KPI 结果，我来帮您挖掘潜在选题
+🤖 **模式一：做一个Agent**
+适合：想把自己的判断逻辑变成AI工具（如：简历筛选Agent、投资决策Agent、面试评估Agent等）
 
-💡 这个过程会帮您：
-✅ 找到您最擅长、最有价值的决策场景
-✅ 拆解您的思考过程，让它变得可复制
-✅ 把经验变成清晰的决策规则
-✅ 生成可以直接使用的 AI 提示词，让你调试自己的 Agent`;
+📚 **模式二：做一门课程**
+适合：想把自己的专业知识变成课程大纲或PPT（如：新员工培训、技能分享、知识传承等）
+
+💡 **两种模式的区别：**
+- Agent更强调"判断"（输入信息 → 输出结论和建议）
+- 课程更强调"教会"（让学员学会并应用）`;
 
             addMessage(welcomeMessage);
-            showModeButtons();
+            showMainModeButtons();
         }
 
-        // 显示模式选择按钮
-        function showModeButtons() {
+        // 显示主模式选择按钮（Agent/课程）
+        function showMainModeButtons() {
             const container = document.getElementById('chatContainer');
             
             const buttonsDiv = document.createElement('div');
@@ -1488,8 +1490,8 @@
             buttonsDiv.innerHTML = `
                 <div class="avatar">🔮</div>
                 <div class="mode-buttons" style="background: #f0f4ff; padding: 12px; border-radius: 16px;">
-                    <button class="mode-btn" onclick="selectMode('quick')">🚀 快速模式</button>
-                    <button class="mode-btn" onclick="selectMode('assisted')">📎 附件模式</button>
+                    <button class="mode-btn" onclick="selectMainMode('agent')">🤖 做一个Agent</button>
+                    <button class="mode-btn" onclick="selectMainMode('course')">📚 做一门课程</button>
                 </div>
             `;
             
@@ -1497,22 +1499,93 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // 选择模式
-        function selectMode(mode) {
+        // 选择主模式（Agent/课程）
+        function selectMainMode(mainMode) {
             const modeButtons = document.getElementById('modeButtonsDiv');
             if (modeButtons) modeButtons.remove();
             
+            sessionData.mainMode = mainMode;
+            
+            // 显示用户选择
+            const modeText = mainMode === 'agent' ? '🤖 做一个Agent' : '📚 做一门课程';
+            addMessage(modeText, true);
+            
+            // 显示子模式选择
+            showSubModeButtons(mainMode);
+        }
+
+        // 显示子模式选择按钮（快速/附件）
+        function showSubModeButtons(mainMode) {
+            const container = document.getElementById('chatContainer');
+            
+            const message = mainMode === 'agent' 
+                ? `太好了！我们来做Agent。\n\n您可以选择：\n\n⚡ **快速模式**：直接回答几个问题（适合思路清晰的专家）\n\n📎 **附件模式**：上传您的简历、述职报告或 KPI 结果，我来帮您挖掘潜在选题`
+                : `太棒了！我们来做课程。\n\n课程开发分为5个关卡，全程大约 15-20 分钟：\n\n📍 **关卡1：课程定位** - 明确谁学、学什么、为什么学\n📍 **关卡2：内容萃取** - 挖掘您的工作步骤、方法工具、挑战窍门\n📍 **关卡3：大纲设计** - 选择适合的课程逻辑结构\n📍 **关卡4：内容确认** - 确认课程框架完整性\n📍 **关卡5：产出交付** - 选择产出物（课题/大纲/PPT）\n\n您可以选择：\n\n⚡ **快速模式**：直接回答问题（适合已明确课程主题）\n\n📎 **附件模式**：上传您的培训资料、工作手册或案例文档，我来帮您梳理课程结构`;
+            
+            addMessage(message);
+            
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.id = 'subModeButtonsDiv';
+            buttonsDiv.className = 'message ai';
+            buttonsDiv.innerHTML = `
+                <div class="avatar">🔮</div>
+                <div class="mode-buttons" style="background: #f0f4ff; padding: 12px; border-radius: 16px;">
+                    <button class="mode-btn" onclick="selectSubMode('quick')">🚀 快速模式</button>
+                    <button class="mode-btn" onclick="selectSubMode('assisted')">📎 附件模式</button>
+                </div>
+            `;
+            
+            container.appendChild(buttonsDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 选择子模式（快速/附件）
+        function selectSubMode(subMode) {
+            const subModeButtons = document.getElementById('subModeButtonsDiv');
+            if (subModeButtons) subModeButtons.remove();
+            
+            sessionData.mode = subMode;
+            
+            const modeText = subMode === 'quick' ? '⚡ 快速模式' : '📎 附件模式';
+            addMessage(modeText, true);
+            
+            document.getElementById('progressBar').classList.remove('hidden');
+            document.getElementById('inputContainer').classList.remove('hidden');
+            
+            // 根据主模式更新进度条标签
+            updateProgressLabels(sessionData.mainMode);
+            
+            // 记录漏斗：开始炼金
+            trackFunnel('start');
+            
+            // 发送模式选择消息
+            sendAIMessage(`${sessionData.mainMode}_${subMode}`);
+        }
+
+        // 更新进度条标签
+        function updateProgressLabels(mainMode) {
+            const labels = mainMode === 'course' 
+                ? ['课程定位', '内容萃取', '大纲设计', '内容确认', '产出交付', '商业化']
+                : ['锁定选题', '拆解决策', '结构化', '专业确认', '封装工具', '商业化'];
+            
+            document.querySelectorAll('.progress-label').forEach((el, index) => {
+                if (labels[index]) {
+                    el.textContent = labels[index];
+                }
+            });
+        }
+
+        // 选择模式（兼容旧代码）
+        function selectMode(mode) {
             sessionData.mode = mode;
+            sessionData.mainMode = 'agent'; // 默认为agent模式
             
             const modeText = mode === 'quick' ? '快速模式' : '附件模式';
             
             document.getElementById('progressBar').classList.remove('hidden');
             document.getElementById('inputContainer').classList.remove('hidden');
             
-            // 记录漏斗：开始炼金
             trackFunnel('start');
-            
-            // 直接发送模式选择消息，不需要先显示用户消息
             sendAIMessage(mode);
         }
 
