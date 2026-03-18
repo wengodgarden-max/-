@@ -1482,18 +1482,54 @@
 
 ---
 
-💡 **准备好了吗？让我们从盘点您的知识资产开始！**
-
-请告诉我：**您目前的工作岗位是什么？在这份工作中主要负责什么？**`;
+💡 **这个过程会帮您：**
+✅ 找到您最擅长、最有价值的决策场景
+✅ 拆解您的思考过程，让它变得可复制
+✅ 把经验变成清晰的产品（Agent或课程）`;
 
             addMessage(welcomeMessage);
+            showModeButtons();
+        }
+
+        // 显示模式选择按钮
+        function showModeButtons() {
+            const container = document.getElementById('chatContainer');
             
-            // 显示输入框
-            document.getElementById('inputContainer').classList.remove('hidden');
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.id = 'modeButtonsDiv';
+            buttonsDiv.className = 'message ai';
+            buttonsDiv.innerHTML = `
+                <div class="avatar">🔮</div>
+                <div class="mode-buttons" style="background: #f0f4ff; padding: 12px; border-radius: 16px;">
+                    <button class="mode-btn" onclick="selectMode('quick')">🚀 快速模式</button>
+                    <button class="mode-btn" onclick="selectMode('assisted')">📎 附件模式</button>
+                </div>
+            `;
+            
+            container.appendChild(buttonsDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 选择模式
+        function selectMode(mode) {
+            const modeButtons = document.getElementById('modeButtonsDiv');
+            if (modeButtons) modeButtons.remove();
+            
+            sessionData.mode = mode;
+            
+            // 显示用户选择
+            const modeText = mode === 'quick' ? '🚀 快速模式' : '📎 附件模式';
+            addMessage(modeText, true);
+            
+            // 显示输入框和进度条
             document.getElementById('progressBar').classList.remove('hidden');
+            document.getElementById('inputContainer').classList.remove('hidden');
             
             // 记录漏斗：开始炼金
             trackFunnel('start');
+            
+            // 发送模式选择消息给AI
+            sendAIMessage(mode);
         }
 
         // 选择主模式（Agent/课程）
