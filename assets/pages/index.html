@@ -1677,20 +1677,6 @@
             });
         }
 
-        // 选择模式（兼容旧代码）
-        function selectMode(mode) {
-            sessionData.mode = mode;
-            sessionData.mainMode = 'agent'; // 默认为agent模式
-            
-            const modeText = mode === 'quick' ? '快速模式' : '附件模式';
-            
-            document.getElementById('progressBar').classList.remove('hidden');
-            document.getElementById('inputContainer').classList.remove('hidden');
-            
-            trackFunnel('start');
-            sendAIMessage(mode);
-        }
-
         // 添加消息
         function addMessage(content, isUser = false) {
             const container = document.getElementById('chatContainer');
@@ -1960,12 +1946,18 @@
             disableInput();
 
             try {
-                // 先显示用户选择
-                const modeText = mode === 'quick' ? '快速模式' : '附件模式';
-                addMessage(`我选择 ${modeText}`, true);
-
-                // 使用自然的对话方式
-                const prompt = `我选择${modeText}，请开始引导我`;
+                // 根据模式设置提示文本
+                let modeText, prompt;
+                if (mode === 'qa') {
+                    modeText = '问答模式';
+                    prompt = '我选择问答模式，请开始引导我';
+                } else if (mode === 'analyze') {
+                    modeText = '分析模式';
+                    prompt = '我选择分析模式，请开始引导我';
+                } else {
+                    modeText = mode;
+                    prompt = `我选择${modeText}，请开始引导我`;
+                }
 
                 console.log('Sending mode selection:', prompt);
 
