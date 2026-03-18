@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>决策炼金师 - 把你的判断力变成付费AI工具</title>
+    <title>炼金师助手 - 把你的判断力变成付费AI工具</title>
     <style>
         * {
             margin: 0;
@@ -157,7 +157,7 @@
         .message-content {
             padding: 15px 18px;
             border-radius: 18px;
-            line-height: 1.6;
+            line-height: 1.8;
             font-size: 15px;
         }
 
@@ -277,98 +277,29 @@
             cursor: not-allowed;
         }
 
-        .file-upload-btn {
-            padding: 10px 20px;
-            border: 2px dashed #667eea;
-            border-radius: 8px;
-            background: white;
-            color: #667eea;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .file-upload-btn:hover {
-            background: #f0f4ff;
-        }
-
-        .file-info {
-            padding: 10px 15px;
-            background: #e3f2fd;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #1976d2;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .file-remove-btn {
-            margin-left: auto;
-            background: none;
-            border: none;
-            color: #f44336;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .mode-selector {
-            padding: 30px;
-            text-align: center;
-        }
-
-        .mode-selector h2 {
-            font-size: 22px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .mode-selector p {
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
         .mode-buttons {
             display: flex;
             gap: 15px;
             justify-content: center;
+            margin-top: 15px;
         }
 
         .mode-btn {
-            padding: 20px 40px;
-            border: 2px solid #e0e0e0;
+            padding: 15px 30px;
+            border: 2px solid #667eea;
             border-radius: 12px;
             background: white;
+            color: #667eea;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            text-align: center;
         }
 
         .mode-btn:hover {
-            border-color: #667eea;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .mode-btn .icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .mode-btn .title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .mode-btn .desc {
-            font-size: 13px;
-            color: #999;
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
         }
 
         .hidden {
@@ -385,10 +316,6 @@
             .mode-buttons {
                 flex-direction: column;
             }
-            
-            .mode-btn {
-                padding: 15px 20px;
-            }
         }
     </style>
 </head>
@@ -397,7 +324,7 @@
         <div class="header">
             <div class="header-icon">🔮</div>
             <div class="header-text">
-                <h1>决策炼金坊</h1>
+                <h1>炼金坊</h1>
                 <p>把你的判断力变成付费AI工具</p>
             </div>
         </div>
@@ -421,46 +348,16 @@
             </div>
         </div>
 
-        <!-- 模式选择页面 -->
-        <div id="modeSelector" class="mode-selector">
-            <h2>💎 欢迎来到决策炼金坊！</h2>
-            <p>
-                您的每一次成功决策，都是等待被提炼的黄金。<br>
-                今天，我们将把您脑中的"隐性知识"变成一款能帮别人解决问题的AI工具！
-            </p>
-            <div class="mode-buttons">
-                <div class="mode-btn" onclick="startChat('quick')">
-                    <div class="icon">🚀</div>
-                    <div class="title">快速模式</div>
-                    <div class="desc">直接回答问题，适合思路清晰的专家</div>
-                </div>
-                <div class="mode-btn" onclick="startChat('assisted')">
-                    <div class="icon">📎</div>
-                    <div class="title">辅助模式</div>
-                    <div class="desc">提供简历/项目总结，我来帮您深度挖掘</div>
-                </div>
-            </div>
-        </div>
-
         <!-- 聊天界面 -->
-        <div id="chatContainer" class="chat-container hidden"></div>
+        <div id="chatContainer" class="chat-container"></div>
 
         <!-- 输入区域 -->
         <div id="inputContainer" class="input-container hidden">
-            <div id="fileInfo" class="file-info hidden">
-                <span>📎</span>
-                <span id="fileName"></span>
-                <button class="file-remove-btn" onclick="removeFile()">✕</button>
-            </div>
             <div class="input-row">
                 <div class="input-wrapper">
                     <input type="text" id="userInput" placeholder="输入您的回答..." />
                 </div>
                 <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
-            </div>
-            <div id="uploadHint" class="hidden" style="text-align: center; color: #999; font-size: 13px;">
-                💡 您也可以粘贴简历、项目总结等文字内容，或上传文档
-                <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload(event)" />
             </div>
         </div>
     </div>
@@ -470,25 +367,73 @@
             sessionId: 'session_' + Date.now(),
             currentLevel: 0,
             mode: null,
-            uploadedFile: null,
             messages: []
         };
 
         const API_BASE = window.location.origin;
 
-        function startChat(mode) {
+        // 页面加载后，AI先打招呼
+        window.onload = function() {
+            showWelcomeMessage();
+        };
+
+        function showWelcomeMessage() {
+            const welcomeMessage = `🔮 **欢迎来到炼金坊！**
+
+我是炼金师小智。您的每一次成功决策，都是等待被提炼的黄金。今天，我们将把您脑中的 "隐性知识" 变成一款能帮别人解决问题的 AI 工具 —— 甚至可以收费哦！
+
+全程大约 20-30 分钟。您可以选择：
+
+**快速模式**：直接回答几个问题（适合思路清晰的专家）
+
+**附件模式**：上传您的简历、述职报告或 KPI 结果，我来帮您挖掘潜在选题
+
+💡 这个过程会帮您：
+✅ 找到您最擅长、最有价值的决策场景
+✅ 拆解您的思考过程，让它变得可复制
+✅ 把经验变成清晰的决策规则
+✅ 生成可以直接使用的 AI 提示词`;
+
+            addMessage(welcomeMessage);
+            
+            // 显示模式选择按钮
+            showModeButtons();
+        }
+
+        function showModeButtons() {
+            const container = document.getElementById('chatContainer');
+            
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.id = 'modeButtonsDiv';
+            buttonsDiv.className = 'message ai';
+            buttonsDiv.innerHTML = `
+                <div class="avatar">🔮</div>
+                <div class="mode-buttons" style="background: #f0f4ff; padding: 15px; border-radius: 18px;">
+                    <button class="mode-btn" onclick="selectMode('quick')">🚀 快速模式</button>
+                    <button class="mode-btn" onclick="selectMode('assisted')">📎 附件模式</button>
+                </div>
+            `;
+            
+            container.appendChild(buttonsDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function selectMode(mode) {
+            // 移除模式选择按钮
+            const modeButtons = document.getElementById('modeButtonsDiv');
+            if (modeButtons) modeButtons.remove();
+            
             sessionData.mode = mode;
-            document.getElementById('modeSelector').classList.add('hidden');
+            
+            // 显示用户选择
+            const modeText = mode === 'quick' ? '快速模式' : '附件模式';
+            addMessage(`我选择 ${modeText}`, true);
+            
+            // 显示进度条和输入框
             document.getElementById('progressBar').classList.remove('hidden');
-            document.getElementById('chatContainer').classList.remove('hidden');
             document.getElementById('inputContainer').classList.remove('hidden');
-
-            // 如果是辅助模式，显示上传提示
-            if (mode === 'assisted') {
-                document.getElementById('uploadHint').classList.remove('hidden');
-            }
-
-            // 让AI先说第一句话
+            
+            // 调用API获取AI响应
             sendAIMessage(mode);
         }
 
@@ -551,12 +496,9 @@
             disableInput();
 
             try {
-                let initialPrompt = '';
-                if (mode === 'quick') {
-                    initialPrompt = '用户选择了快速模式，请开始引导第一关的问题，直接提问用户最擅长解决什么问题。';
-                } else {
-                    initialPrompt = '用户选择了辅助模式，请开始引导，先询问用户的职业背景和工作年限。';
-                }
+                const prompt = mode === 'quick' 
+                    ? '用户选择了快速模式，请开始引导第一关的问题，直接提问用户最擅长解决什么问题。'
+                    : '用户选择了附件模式，请开始引导，先询问用户的职业背景和工作年限。';
 
                 const response = await fetch(`${API_BASE}/alchemist/chat`, {
                     method: 'POST',
@@ -564,7 +506,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message: initialPrompt,
+                        message: prompt,
                         session_id: sessionData.sessionId,
                         mode: mode
                     })
@@ -583,30 +525,19 @@
                 hideTyping();
                 console.error('Error:', error);
                 // 如果API调用失败，使用本地模拟
-                const welcomeMessage = getWelcomeMessage(mode);
-                addMessage(welcomeMessage);
+                const localMessage = getLocalFirstQuestion(mode);
+                addMessage(localMessage);
                 enableInput();
             }
         }
 
-        function getWelcomeMessage(mode) {
+        function getLocalFirstQuestion(mode) {
             if (mode === 'quick') {
-                return `🔮 **欢迎来到决策炼金坊！**
-
-我是您的炼金师小智。您的每一次成功决策，都是等待被提炼的黄金！今天，我们将把您脑中的"隐性知识"变成一款能帮别人解决问题的AI工具——甚至可以收费哦！
-
----
+                return `很好！让我们开始快速模式。
 
 💎 **第一关：锁定宝藏选题**
 
-我们要找的选题，应该满足三个条件：
-✅ 您有独特经验
-✅ 别人有强烈需求  
-✅ 能封装成AI工具
-
----
-
-**问题：您最擅长解决哪类问题？**
+**问题1：您最擅长解决哪类问题？**
 
 可以是工作中经常遇到的，也可以是别人经常向您请教的。请用一句话描述这个场景。
 
@@ -617,17 +548,11 @@
 
 请告诉我，您最擅长解决什么问题？`;
             } else {
-                return `🔮 **欢迎来到决策炼金坊！**
-
-我是您的炼金师小智。您的每一次成功决策，都是等待被提炼的黄金！
-
-您选择了**辅助模式**，太好了！我会通过引导问题，帮您从工作经历中挖掘最有价值的决策场景。
-
----
+                return `很好！让我们开始附件模式。
 
 💎 **第一关：锁定宝藏选题**
 
-让我们先了解一下您的职业背景：
+我会通过几个问题帮您深度挖掘潜在决策场景。
 
 **问题1：请简单介绍一下您的职业背景**
 
@@ -690,12 +615,9 @@
         function getLocalResponse(userMessage) {
             const msg = userMessage.toLowerCase();
             
-            // 根据模式不同给予不同响应
             if (sessionData.mode === 'assisted') {
                 if (msg.includes('年') || msg.includes('岗位') || msg.includes('负责')) {
                     return `很好！看到您的职业背景了。
-
-接下来，让我们盘点一下您的工作成就：
 
 **问题2：您最近一段工作中最重要的项目或成就是什么？**
 
@@ -706,39 +628,26 @@
 
 例如：
 - "搭建会员体系，用户7日留存提升25%，付费率提升15%"
-- "重构交易系统，系统响应时间从2秒降到200ms"
 
 请告诉我您的成就！`;
                 } else if (msg.includes('项目') || msg.includes('提升') || msg.includes('完成')) {
                     return `非常棒的成就！🎯
 
-您提到的这些项目经验非常有价值。现在让我换个角度：
-
 **问题3：您最常被请教的问题是什么？**
 
 回想一下，同事或朋友经常向您请教哪类问题？
 - 他们遇到什么困难时会想到您？
-- 这些问题通常涉及什么场景？
-- 您是如何帮助他们的？
-
-这些"被请教的时刻"，往往就是最有价值的决策场景！`;
+- 这些问题通常涉及什么场景？`;
                 } else {
                     return `感谢您的分享！这些信息很有价值。
 
 根据您提供的信息，我帮您提炼一下潜在的决策场景：
 
-您可能擅长：
-1. 基于您的工作经验判断某些决策
-2. 帮助他人解决类似的困惑
+您可能擅长某个领域的决策判断。请告诉我：
 
-**接下来，我想了解：**
-
-您一眼就能看穿、别人却觉得复杂的问题是什么？
-
-比如在您的专业领域，有什么是新手容易犯错、但您一眼就能判断对错的场景？`;
+您一眼就能看穿、别人却觉得复杂的问题是什么？`;
                 }
             } else {
-                // 快速模式
                 if (msg.includes('擅长') || msg.includes('问题') || msg.includes('判断')) {
                     return `很好！您提到的决策场景很有价值！
 
@@ -749,21 +658,13 @@
 - 什么经验水平？
 - 在什么情况下会用到这个能力？
 
-例如：
-- "刚入职的投放专员，每天面对数据报表不知道如何调整预算"
-- "产品新人，不知道如何评估需求优先级"
-
 请告诉我，谁最需要您这个能力？`;
                 } else {
-                    return `感谢您的回答！您提到的内容很有价值。
+                    return `感谢您的回答！
 
 **问题3：如果他们判断失误，会有什么后果？**
 
 这个决策失误会造成什么损失？这能帮助我们验证这个场景的价值。
-
-例如：
-- "盲目加码导致预算浪费，或者错过优质渠道"
-- "错误评估导致开发资源浪费，错失市场机会"
 
 请告诉我，判断失误的后果是什么？`;
                 }
@@ -802,21 +703,6 @@
         function enableInput() {
             document.getElementById('userInput').disabled = false;
             document.getElementById('sendBtn').disabled = false;
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                sessionData.uploadedFile = file;
-                document.getElementById('fileName').textContent = file.name;
-                document.getElementById('fileInfo').classList.remove('hidden');
-            }
-        }
-
-        function removeFile() {
-            sessionData.uploadedFile = null;
-            document.getElementById('fileInput').value = '';
-            document.getElementById('fileInfo').classList.add('hidden');
         }
 
         // 回车发送
