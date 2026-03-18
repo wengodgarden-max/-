@@ -1,19 +1,17 @@
 """
 付费验证工具 - 用于验证用户是否有使用权限
+支持：免费体验轮次控制、激活码验证、重做次数限制
 """
 import os
 import json
-import hashlib
 from typing import Optional, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime
 from langchain.tools import tool, ToolRuntime
 from coze_coding_utils.runtime_ctx.context import new_context
 
 # 预设验证码（实际生产环境应该用数据库）
-# 格式: {验证码: {"usage_limit": 5, "expires_at": "2025-12-31"}}
 VERIFICATION_CODES = {
-    # 体验版 ¥9.9 / 5次（内测激活码，可多次使用）
-    "ALCH-TRIAL-2025": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
+    # 体验版 ¥9.9 / 5次
     "GOLD-001": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
     "GOLD-002": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
     "GOLD-003": {"usage_limit": 5, "plan": "体验版", "price": 9.9},
@@ -37,6 +35,12 @@ VERIFICATION_CODES = {
     "DIAMOND-002": {"usage_limit": 100, "plan": "年度会员", "price": 99},
     "DIAMOND-003": {"usage_limit": 100, "plan": "年度会员", "price": 99},
 }
+
+# 免费试用对话轮数（让用户感受到价值，但需要付费才能完整产出）
+FREE_TRIAL_ROUNDS = 5
+
+# 每次使用允许的重做次数
+MAX_REDO_COUNT = 1
 
 # 用户权限存储路径
 USER_AUTH_FILE = "assets/data/user_auth.json"
@@ -62,11 +66,8 @@ def _save_user_auth(data: Dict[str, Any]) -> None:
 
 def _get_user_id(ctx) -> str:
     """获取用户唯一标识"""
-    # 尝试从上下文获取用户ID
-    if hasattr(ctx, 'user_id') and ctx.user_id:
+    if ctx and hasattr(ctx, 'user_id') and ctx.user_id:
         return ctx.user_id
-    
-    # 使用默认ID
     return "default_user"
 
 
@@ -78,39 +79,109 @@ def check_user_permission(ctx=None) -> Dict[str, Any]:
         {
             "has_permission": bool,
             "remaining_uses": int,
+            "remaining_rounds": int,  # 免费对话轮数
             "plan": str,
-            "message": str
+            "message": str,
+            "is_free_trial": bool,
+            "should_prompt_payment": bool  # 是否应该提示付费
         }
     """
     user_id = _get_user_id(ctx) if ctx else "default_user"
     auth_data = _load_user_auth()
     
+    # 新用户：有5轮免费对话
     if user_id not in auth_data:
         return {
-            "has_permission": False,
+            "has_permission": True,
             "remaining_uses": 0,
-            "plan": None,
-            "message": "您还未激活，请输入验证码解锁使用"
+            "remaining_rounds": FREE_TRIAL_ROUNDS,
+            "current_round": 0,
+            "plan": "免费体验",
+            "message": f"🎉 新用户福利：可免费体验 {FREE_TRIAL_ROUNDS} 轮对话，满意再付费！",
+            "is_free_trial": True,
+            "should_prompt_payment": False,
+            "can_redo": False
         }
     
     user_info = auth_data[user_id]
-    remaining = user_info.get("usage_limit", 0) - user_info.get("usage_count", 0)
     
+    # 检查免费对话轮数
+    current_round = user_info.get("free_rounds_used", 0)
+    remaining_free_rounds = max(0, FREE_TRIAL_ROUNDS - current_round)
+    
+    # 还有免费轮数
+    if remaining_free_rounds > 0 and not user_info.get("activated", False):
+        should_prompt = remaining_free_rounds <= 2  # 剩余2轮时开始提示
+        
+        return {
+            "has_permission": True,
+            "remaining_uses": 0,
+            "remaining_rounds": remaining_free_rounds,
+            "current_round": current_round,
+            "plan": "免费体验",
+            "message": f"免费体验还剩 {remaining_free_rounds} 轮对话",
+            "is_free_trial": True,
+            "should_prompt_payment": should_prompt,
+            "can_redo": False
+        }
+    
+    # 已激活用户
+    if user_info.get("activated", False):
+        remaining = user_info.get("usage_limit", 0) - user_info.get("usage_count", 0)
+        redo_used = user_info.get("redo_count", 0)
+        can_redo = redo_used < MAX_REDO_COUNT
+        
+        return {
+            "has_permission": remaining > 0,
+            "remaining_uses": remaining,
+            "remaining_rounds": 0,
+            "current_round": current_round,
+            "plan": user_info.get("plan", "未知"),
+            "message": f"您还有 {remaining} 次使用机会" if remaining > 0 else "使用次数已用完，请续费",
+            "is_free_trial": False,
+            "should_prompt_payment": remaining <= 0,
+            "can_redo": can_redo
+        }
+    
+    # 免费轮数用完，需要激活
     return {
-        "has_permission": remaining > 0,
-        "remaining_uses": remaining,
-        "plan": user_info.get("plan", "未知"),
-        "message": f"您还有 {remaining} 次使用机会" if remaining > 0 else "使用次数已用完，请续费"
+        "has_permission": False,
+        "remaining_uses": 0,
+        "remaining_rounds": 0,
+        "current_round": current_round,
+        "plan": "免费体验",
+        "message": "⚠️ 免费体验已用完\n\n解锁完整产出物需要激活码\n💡 激活后可获得：\n• 完整的AI Agent提示词\n• 测试用例\n• 上架指南\n• 推广文案\n• 定价建议\n\n💰 套餐：体验版¥9.9/标准版¥29.9/年度会员¥99",
+        "is_free_trial": False,
+        "should_prompt_payment": True,
+        "can_redo": False
     }
 
 
-def consume_usage(ctx=None) -> bool:
-    """
-    消耗一次使用机会
+def consume_free_round(ctx=None) -> bool:
+    """消耗一轮免费对话"""
+    user_id = _get_user_id(ctx) if ctx else "default_user"
+    auth_data = _load_user_auth()
     
-    Returns:
-        是否成功消耗
-    """
+    if user_id not in auth_data:
+        auth_data[user_id] = {
+            "free_rounds_used": 1,
+            "activated": False,
+            "created_at": datetime.now().isoformat(),
+            "redo_count": 0
+        }
+        _save_user_auth(auth_data)
+        return True
+    
+    user_info = auth_data[user_id]
+    user_info["free_rounds_used"] = user_info.get("free_rounds_used", 0) + 1
+    user_info["last_used"] = datetime.now().isoformat()
+    _save_user_auth(auth_data)
+    
+    return True
+
+
+def consume_usage(ctx=None) -> bool:
+    """消耗一次付费使用机会"""
     user_id = _get_user_id(ctx) if ctx else "default_user"
     auth_data = _load_user_auth()
     
@@ -125,6 +196,29 @@ def consume_usage(ctx=None) -> bool:
     
     user_info["usage_count"] = user_info.get("usage_count", 0) + 1
     user_info["last_used"] = datetime.now().isoformat()
+    # 重置重做次数
+    user_info["redo_count"] = 0
+    _save_user_auth(auth_data)
+    
+    return True
+
+
+def record_redo(ctx=None) -> bool:
+    """记录一次重做"""
+    user_id = _get_user_id(ctx) if ctx else "default_user"
+    auth_data = _load_user_auth()
+    
+    if user_id not in auth_data:
+        return False
+    
+    user_info = auth_data[user_id]
+    redo_count = user_info.get("redo_count", 0)
+    
+    if redo_count >= MAX_REDO_COUNT:
+        return False
+    
+    user_info["redo_count"] = redo_count + 1
+    user_info["last_redo"] = datetime.now().isoformat()
     _save_user_auth(auth_data)
     
     return True
@@ -136,7 +230,7 @@ def verify_code(code: str, runtime: ToolRuntime = None) -> str:
     验证激活码，解锁使用权限
     
     Args:
-        code: 激活码（格式如 ALCH-TRIAL-2025）
+        code: 激活码（格式如 GOLD-001）
         
     Returns:
         验证结果信息
@@ -148,48 +242,52 @@ def verify_code(code: str, runtime: ToolRuntime = None) -> str:
     if code not in VERIFICATION_CODES:
         return json.dumps({
             "success": False,
-            "message": "❌ 验证码无效，请检查后重试"
+            "message": "❌ 激活码无效\n\n💡 购买激活码请联系客服\n• 体验版 ¥9.9 / 5次\n• 标准版 ¥29.9 / 20次\n• 年度会员 ¥99 / 100次"
         }, ensure_ascii=False)
     
     code_info = VERIFICATION_CODES[code]
     auth_data = _load_user_auth()
     
-    # 检查用户是否已激活
-    if user_id in auth_data:
-        old_plan = auth_data[user_id].get("plan", "未知")
-        old_remaining = auth_data[user_id].get("usage_limit", 0) - auth_data[user_id].get("usage_count", 0)
-        
-        # 如果已有权限，叠加次数
-        auth_data[user_id]["usage_limit"] += code_info["usage_limit"]
-        auth_data[user_id]["plan"] = code_info["plan"]
-        auth_data[user_id]["activated_at"] = datetime.now().isoformat()
+    # 新用户激活
+    if user_id not in auth_data:
+        auth_data[user_id] = {
+            "code": code,
+            "plan": code_info["plan"],
+            "usage_limit": code_info["usage_limit"],
+            "usage_count": 0,
+            "activated": True,
+            "free_rounds_used": FREE_TRIAL_ROUNDS,
+            "activated_at": datetime.now().isoformat(),
+            "price": code_info["price"],
+            "redo_count": 0
+        }
         _save_user_auth(auth_data)
         
         return json.dumps({
             "success": True,
-            "message": f"✅ 验证成功！已为您增加 {code_info['usage_limit']} 次使用机会",
+            "message": f"✅ 激活成功！您已开通「{code_info['plan']}」，可使用 {code_info['usage_limit']} 次！\n\n现在可以继续您的炼金之旅了！",
             "plan": code_info["plan"],
-            "total_uses": auth_data[user_id]["usage_limit"],
-            "remaining_uses": auth_data[user_id]["usage_limit"] - auth_data[user_id]["usage_count"]
+            "total_uses": code_info["usage_limit"],
+            "remaining_uses": code_info["usage_limit"]
         }, ensure_ascii=False)
     
-    # 新用户激活
-    auth_data[user_id] = {
-        "code": code,
-        "plan": code_info["plan"],
-        "usage_limit": code_info["usage_limit"],
-        "usage_count": 0,
-        "activated_at": datetime.now().isoformat(),
-        "price": code_info["price"]
-    }
+    # 老用户：叠加次数
+    user_info = auth_data[user_id]
+    user_info["usage_limit"] = user_info.get("usage_limit", 0) + code_info["usage_limit"]
+    user_info["plan"] = code_info["plan"]
+    user_info["activated"] = True
+    user_info["activated_at"] = datetime.now().isoformat()
+    user_info["redo_count"] = 0
     _save_user_auth(auth_data)
+    
+    total_remaining = user_info["usage_limit"] - user_info.get("usage_count", 0)
     
     return json.dumps({
         "success": True,
-        "message": f"✅ 激活成功！您已开通「{code_info['plan']}」",
+        "message": f"✅ 激活成功！已增加 {code_info['usage_limit']} 次使用机会，共 {total_remaining} 次！",
         "plan": code_info["plan"],
-        "total_uses": code_info["usage_limit"],
-        "remaining_uses": code_info["usage_limit"]
+        "total_uses": user_info["usage_limit"],
+        "remaining_uses": total_remaining
     }, ensure_ascii=False)
 
 
@@ -216,37 +314,52 @@ def get_pricing_info(runtime: ToolRuntime = None) -> str:
         定价套餐详情
     """
     pricing = {
+        "message": "💰 激活码套餐",
         "plans": [
-            {
-                "name": "体验版",
-                "price": 9.9,
-                "uses": 5,
-                "unit_price": 1.98,
-                "best_for": "想先体验效果的用户",
-                "features": ["5次完整炼金流程", "产出Agent或课程", "7天有效期"]
-            },
-            {
-                "name": "标准版",
-                "price": 29.9,
-                "uses": 20,
-                "unit_price": 1.50,
-                "best_for": "想批量产出知识产品的用户",
-                "features": ["20次完整炼金流程", "产出Agent或课程", "30天有效期", "优先客服支持"]
-            },
-            {
-                "name": "年度会员",
-                "price": 99,
-                "uses": 100,
-                "unit_price": 0.99,
-                "best_for": "长期经营知识产品的用户",
-                "features": ["100次完整炼金流程", "产出Agent或课程", "365天有效期", "专属客服群", "新功能优先体验"]
-            }
+            {"name": "体验版", "price": 9.9, "uses": 5, "recommend": "适合想先试试的用户"},
+            {"name": "标准版", "price": 29.9, "uses": 20, "recommend": "性价比最高"},
+            {"name": "年度会员", "price": 99, "uses": 100, "recommend": "适合长期使用"}
         ],
-        "payment_methods": [
-            "小红书私信付款",
-            "微信扫码支付"
-        ],
-        "contact": "付款后联系客服获取激活码"
+        "note": "联系客服购买激活码，输入激活码即可使用",
+        "free_trial": f"🎁 新用户可免费体验 {FREE_TRIAL_ROUNDS} 轮对话，满意再付费",
+        "guarantee": "✨ 满意度保障：不满意可免费重做1次"
     }
     
     return json.dumps(pricing, ensure_ascii=False)
+
+
+@tool
+def request_redo(reason: str, runtime: ToolRuntime = None) -> str:
+    """
+    申请重新产出（不满意时使用）
+    
+    Args:
+        reason: 具体哪里不满意，需要怎么调整
+        
+    Returns:
+        重做申请结果
+    """
+    ctx = runtime.context if runtime else new_context(method="request_redo")
+    user_id = _get_user_id(ctx)
+    
+    # 检查权限
+    permission = check_user_permission(ctx)
+    
+    if not permission.get("can_redo", False):
+        return json.dumps({
+            "success": False,
+            "message": "⚠️ 抱歉，重做次数已用完\n\n每次使用仅限重做1次，建议您：\n1. 详细说明需要调整的地方\n2. 或者激活新的使用次数"
+        }, ensure_ascii=False)
+    
+    # 记录重做
+    if record_redo(ctx):
+        return json.dumps({
+            "success": True,
+            "message": f"✅ 已为您申请重做\n\n您的反馈：{reason}\n\n我会根据您的反馈重新产出，请稍等...",
+            "redo_remaining": MAX_REDO_COUNT - 1
+        }, ensure_ascii=False)
+    
+    return json.dumps({
+        "success": False,
+        "message": "重做申请失败，请稍后重试"
+    }, ensure_ascii=False)

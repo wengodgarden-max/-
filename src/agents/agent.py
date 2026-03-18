@@ -14,7 +14,7 @@ from coze_coding_utils.runtime_ctx.context import default_headers
 from storage.memory.memory_saver import get_memory_saver
 from tools.document_parser import parse_document  # 导入文档解析工具
 from tools.web_search_tool import web_search, get_industry_benchmark  # 导入搜索工具
-from tools.payment_tool import verify_code, check_permission, get_pricing_info  # 导入付费验证工具
+from tools.payment_tool import verify_code, check_permission, get_pricing_info, request_redo  # 导入付费验证工具
 
 LLM_CONFIG = "config/agent_llm_config.json"
 
@@ -89,6 +89,9 @@ def build_agent(ctx=None):
     
     if "get_pricing_info" in tools_config:
         tools.append(get_pricing_info)
+    
+    if "request_redo" in tools_config:
+        tools.append(request_redo)
 
     return create_agent(
         model=llm,

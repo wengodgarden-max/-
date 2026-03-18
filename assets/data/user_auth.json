@@ -1,0 +1,13 @@
+{
+  "default_user": {
+    "code": "ALCH-TRIAL-2025",
+    "plan": "体验版",
+    "usage_limit": 10,
+    "usage_count": 0,
+    "activated_at": "2026-03-18T18:19:19.793324",
+    "price": 9.9,
+    "activated": true,
+    "redo_count": 1,
+    "last_redo": "2026-03-18T18:19:41.509425"
+  }
+}
