@@ -1151,8 +1151,11 @@
             myTools: []
         };
 
-        // API地址
-        const API_BASE = window.location.origin;
+        // API地址 - 使用后端服务器地址
+        // 如果通过对象存储访问，需要指定后端服务器
+        const API_BASE = window.location.hostname.includes('tos.coze.site') 
+            ? 'https://507ced78-5ee2-494c-864f-94f2e1c835b5.dev.coze.site'  // 后端服务器地址
+            : window.location.origin;  // 如果直接访问后端，使用当前域名
 
         // 语音识别相关
         let recognition = null;
@@ -1469,16 +1472,12 @@
             sessionData.mode = mode;
             
             const modeText = mode === 'quick' ? '快速模式' : '附件模式';
-            addMessage(`我选择 ${modeText}`, true);
             
             document.getElementById('progressBar').classList.remove('hidden');
             document.getElementById('inputContainer').classList.remove('hidden');
             
-            if (mode === 'assisted' && sessionData.uploadedFile) {
-                sendFileToBackend(sessionData.uploadedFile);
-            } else {
-                sendAIMessage(mode);
-            }
+            // 直接发送模式选择消息，不需要先显示用户消息
+            sendAIMessage(mode);
         }
 
         // 添加消息
@@ -1704,10 +1703,14 @@
             disableInput();
 
             try {
-                // 使用自然的对话方式，而不是指令式
-                const prompt = mode === 'quick' 
-                    ? '我选择快速模式'
-                    : '我选择附件模式';
+                // 先显示用户选择
+                const modeText = mode === 'quick' ? '快速模式' : '附件模式';
+                addMessage(`我选择 ${modeText}`, true);
+
+                // 使用自然的对话方式
+                const prompt = `我选择${modeText}，请开始引导我`;
+
+                console.log('Sending mode selection:', prompt);
 
                 const response = await fetch(`${API_BASE}/alchemist/chat`, {
                     method: 'POST',
@@ -1716,26 +1719,35 @@
                         message: prompt,
                         session_id: sessionData.sessionId,
                         mode: sessionData.mode,
-                        messages: sessionData.messages  // 发送对话历史
+                        messages: sessionData.messages
                     })
                 });
 
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
+                console.log('Response data:', data);
+                
                 hideTyping();
                 
                 if (data.status === 'success') {
                     addMessage(data.message);
                     enableInput();
                 } else {
+                    console.error('API returned error:', data);
                     addMessage('抱歉，出现了一些问题，请刷新页面重试。');
                 }
             } catch (error) {
                 hideTyping();
-                console.error('Error:', error);
-                const localMessage = getLocalFirstQuestion(mode);
-                addMessage(localMessage);
-                enableInput();
+                console.error('API call failed:', error);
+                addMessage('⚠️ 网络连接出现问题，请刷新页面重试。\n\n错误信息: ' + error.message);
             }
+            
+            enableInput();
         }
 
         // 本地首问
@@ -1787,6 +1799,9 @@
             showTyping();
 
             try {
+                console.log('Sending message:', message);
+                console.log('Messages history:', sessionData.messages);
+                
                 const response = await fetch(`${API_BASE}/alchemist/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1794,24 +1809,33 @@
                         message: message,
                         session_id: sessionData.sessionId,
                         mode: sessionData.mode,
-                        messages: sessionData.messages  // 发送对话历史
+                        messages: sessionData.messages
                     })
                 });
 
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
+                console.log('Response data:', data);
+                
                 hideTyping();
                 
                 if (data.status === 'success') {
                     addMessage(data.message);
                     updateProgress(data.message);
                 } else {
+                    console.error('API returned error:', data);
                     addMessage('抱歉，出现了一些问题，请重试。');
                 }
             } catch (error) {
                 hideTyping();
-                console.error('Error:', error);
-                const localResponse = getLocalResponse(message);
-                addMessage(localResponse);
+                console.error('API call failed:', error);
+                // 不使用本地响应，而是提示用户重试
+                addMessage('⚠️ 网络连接出现问题，请刷新页面重试。\n\n错误信息: ' + error.message);
             }
 
             enableInput();
