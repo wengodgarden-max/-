@@ -670,6 +670,29 @@ async def track_reward(request: Request):
         logger.error(f"Error tracking reward: {e}")
         return {"status": "error"}
 
+@app.post("/api/stats/funnel")
+async def track_funnel(request: Request):
+    """记录漏斗阶段"""
+    try:
+        _reset_daily_stats()
+        payload = await request.json()
+        stage = payload.get("stage", "")  # start, topic, rules, output
+        
+        with _stats_lock:
+            if stage == "start":
+                _stats_data["funnel_start"] += 1
+            elif stage == "topic":
+                _stats_data["funnel_topic"] += 1
+            elif stage == "rules":
+                _stats_data["funnel_rules"] += 1
+            elif stage == "output":
+                _stats_data["funnel_output"] += 1
+        
+        return {"status": "success"}
+    except Exception as e:
+        logger.error(f"Error tracking funnel: {e}")
+        return {"status": "error"}
+
 @app.get("/api/stats/data")
 async def get_stats_data():
     """获取统计数据"""

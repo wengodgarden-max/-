@@ -1484,6 +1484,9 @@
             document.getElementById('progressBar').classList.remove('hidden');
             document.getElementById('inputContainer').classList.remove('hidden');
             
+            // 记录漏斗：开始炼金
+            trackFunnel('start');
+            
             // 直接发送模式选择消息，不需要先显示用户消息
             sendAIMessage(mode);
         }
@@ -1900,15 +1903,30 @@
         function updateProgress(message) {
             if (message.includes('第二关') || message.includes('关卡2')) {
                 setProgress(2);
+                trackFunnel('topic');
             } else if (message.includes('第三关') || message.includes('关卡3')) {
                 setProgress(3);
+                trackFunnel('rules');
             } else if (message.includes('第四关') || message.includes('关卡4') || message.includes('专业确认') || message.includes('确认产出')) {
                 setProgress(4);
             } else if (message.includes('第五关') || message.includes('关卡5') || message.includes('封装确认') || message.includes('Prompt')) {
                 setProgress(5);
             } else if (message.includes('第六关') || message.includes('关卡6') || message.includes('商业化') || message.includes('打赏')) {
                 setProgress(6);
+                trackFunnel('output');
             }
+        }
+        
+        // 记录漏斗阶段
+        function trackFunnel(stage) {
+            fetch('/api/stats/funnel', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({stage: stage})
+            }).catch(e => console.log('Track funnel error:', e));
+            
+            // 刷新统计数据
+            setTimeout(loadStatsData, 500);
         }
 
         function setProgress(level) {
@@ -1946,7 +1964,105 @@
                     sendMessage();
                 }
             });
+            
+            // 初始化统计数据
+            initStats();
         });
+        
+        // 初始化统计数据
+        function initStats() {
+            // 生成或获取sessionId
+            let sessionId = localStorage.getItem('alchemist_session_id');
+            if (!sessionId) {
+                sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('alchemist_session_id', sessionId);
+            }
+            
+            // 记录访问
+            fetch('/api/stats/visit', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({sessionId: sessionId})
+            }).catch(e => console.log('Track visit error:', e));
+            
+            // 获取并更新统计数据
+            loadStatsData();
+            
+            // 每30秒刷新一次统计数据
+            setInterval(loadStatsData, 30000);
+        }
+        
+        // 加载统计数据
+        function loadStatsData() {
+            fetch('/api/stats/data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) return;
+                    
+                    // 更新核心指标
+                    document.getElementById('totalVisits').textContent = formatNumber(data.totalVisits);
+                    document.getElementById('todayVisits').textContent = formatNumber(data.todayVisits);
+                    document.getElementById('weekVisits').textContent = formatNumber(data.weekVisits);
+                    
+                    document.getElementById('totalUsers').textContent = formatNumber(data.totalUsers);
+                    document.getElementById('todayUsers').textContent = formatNumber(data.todayUsers);
+                    document.getElementById('returningUsers').textContent = formatNumber(data.returningUsers);
+                    
+                    document.getElementById('totalOutputs').textContent = formatNumber(data.totalOutputs);
+                    document.getElementById('todayOutputs').textContent = formatNumber(data.todayOutputs);
+                    
+                    // 更新转化漏斗
+                    const total = Math.max(data.funnelStart, 1);
+                    updateFunnel('funnelStart', data.funnelStart, total, 100);
+                    updateFunnel('funnelTopic', data.funnelTopic, total, 0);
+                    updateFunnel('funnelRules', data.funnelRules, total, 0);
+                    updateFunnel('funnelOutput', data.funnelOutput, total, 0);
+                })
+                .catch(e => console.log('Load stats error:', e));
+        }
+        
+        // 更新漏斗图
+        function updateFunnel(id, value, total, defaultPercent) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = formatNumber(value);
+            }
+            // 更新进度条
+            const bar = el?.closest('.funnel-item')?.querySelector('.funnel-fill');
+            if (bar) {
+                const percent = total > 0 ? Math.round(value / total * 100) : defaultPercent;
+                bar.style.width = percent + '%';
+            }
+        }
+        
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 10000) {
+                return (num / 10000).toFixed(1) + 'w';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num || 0;
+        }
+        
+        // 记录完成产出
+        function trackComplete(mode) {
+            const sessionId = localStorage.getItem('alchemist_session_id') || 'unknown';
+            fetch('/api/stats/complete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({sessionId: sessionId, mode: mode})
+            }).catch(e => console.log('Track complete error:', e));
+        }
+        
+        // 记录打赏开通
+        function trackReward() {
+            fetch('/api/stats/reward', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({})
+            }).catch(e => console.log('Track reward error:', e));
+        }
     </script>
 </body>
 </html>
