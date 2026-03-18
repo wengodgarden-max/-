@@ -1106,7 +1106,15 @@
                         </div>
                         <div class="progress-step">
                             <div class="progress-circle" id="step4">4</div>
+                            <span class="progress-label">专业确认</span>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-circle" id="step5">5</div>
                             <span class="progress-label">封装工具</span>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-circle" id="step6">6</div>
+                            <span class="progress-label">商业化</span>
                         </div>
                     </div>
 
@@ -1894,13 +1902,17 @@
                 setProgress(2);
             } else if (message.includes('第三关') || message.includes('关卡3')) {
                 setProgress(3);
-            } else if (message.includes('第四关') || message.includes('关卡4') || message.includes('恭喜') || message.includes('🎉')) {
+            } else if (message.includes('第四关') || message.includes('关卡4') || message.includes('专业确认') || message.includes('确认产出')) {
                 setProgress(4);
+            } else if (message.includes('第五关') || message.includes('关卡5') || message.includes('封装确认') || message.includes('Prompt')) {
+                setProgress(5);
+            } else if (message.includes('第六关') || message.includes('关卡6') || message.includes('商业化') || message.includes('打赏')) {
+                setProgress(6);
             }
         }
 
         function setProgress(level) {
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 6; i++) {
                 const step = document.getElementById('step' + i);
                 step.classList.remove('active', 'completed');
                 
