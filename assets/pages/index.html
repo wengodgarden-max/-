@@ -924,6 +924,260 @@
         .overlay.show {
             display: block;
         }
+
+        /* 付费墙样式 */
+        .paywall-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .paywall-overlay.show {
+            display: flex;
+        }
+
+        .paywall-modal {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .paywall-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .paywall-header-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .paywall-header h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .paywall-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .paywall-content {
+            padding: 20px;
+        }
+
+        .paywall-tip {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .pricing-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .pricing-card {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--primary-color);
+        }
+
+        .pricing-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .pricing-card.recommended {
+            border-color: var(--warning-color);
+        }
+
+        .pricing-card.recommended::before {
+            content: "推荐";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--warning-color);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .pricing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .pricing-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .pricing-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--danger-color);
+        }
+
+        .pricing-price span {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .pricing-uses {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 5px;
+        }
+
+        .pricing-unit {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .verify-section {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .verify-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .verify-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .verify-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .verify-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .verify-btn {
+            padding: 12px 20px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .verify-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .verify-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .verify-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .verify-result.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .verify-result.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .paywall-footer {
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .paywall-footer p {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .contact-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .paywall-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
