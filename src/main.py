@@ -9,7 +9,8 @@ import cozeloop
 import uvicorn
 import time
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
@@ -236,11 +237,88 @@ class GraphService:
 service = GraphService()
 app = FastAPI()
 
+# 决策炼金师页面路由
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    """决策炼金师首页"""
+    workspace_path = os.getenv("COZE_WORKSPACE_PATH", "/workspace/projects")
+    html_path = os.path.join(workspace_path, "assets/pages/index.html")
+    try:
+        with open(html_path, 'r', encoding='utf-8') as f:
+            return HTMLResponse(content=f.read(), status_code=200)
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>页面未找到</h1>", status_code=404)
+
+@app.get("/alchemist", response_class=HTMLResponse)
+async def alchemist_page():
+    """决策炼金师页面"""
+    workspace_path = os.getenv("COZE_WORKSPACE_PATH", "/workspace/projects")
+    html_path = os.path.join(workspace_path, "assets/pages/index.html")
+    try:
+        with open(html_path, 'r', encoding='utf-8') as f:
+            return HTMLResponse(content=f.read(), status_code=200)
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>页面未找到</h1>", status_code=404)
+
 # OpenAI 兼容接口处理器
 openai_handler = OpenAIChatHandler(service)
 
 
 HEADER_X_RUN_ID = "x-run-id"
+
+# 决策炼金师对话API
+@app.post("/alchemist/chat")
+async def alchemist_chat(request: Request):
+    """决策炼金师对话接口"""
+    ctx = new_context(method="alchemist_chat", headers=request.headers)
+    request_context.set(ctx)
+    
+    try:
+        payload = await request.json()
+        message = payload.get("message", "")
+        session_id = payload.get("session_id", "default")
+        
+        if not message:
+            raise HTTPException(status_code=400, detail="消息不能为空")
+        
+        # 调用Agent处理
+        from agents.agent import build_agent
+        agent = build_agent(ctx)
+        
+        run_config = init_agent_config(agent, ctx)
+        run_config["configurable"] = {"thread_id": session_id}
+        
+        # 准备输入
+        input_data = {
+            "messages": [{"type": "human", "content": message}]
+        }
+        
+        # 调用Agent
+        result = await agent.ainvoke(input_data, config=run_config, context=ctx)
+        
+        # 提取响应
+        messages = result.get("messages", [])
+        response_text = ""
+        if messages:
+            last_message = messages[-1]
+            response_text = last_message.content if hasattr(last_message, 'content') else str(last_message)
+        
+        return {
+            "status": "success",
+            "message": response_text,
+            "session_id": session_id,
+            "run_id": ctx.run_id
+        }
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error in alchemist_chat: {e}")
+        raise HTTPException(status_code=400, detail="Invalid JSON format")
+    except Exception as e:
+        logger.error(f"Error in alchemist_chat: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cozeloop.flush()
+
 @app.post("/run")
 async def http_run(request: Request) -> Dict[str, Any]:
     global result
