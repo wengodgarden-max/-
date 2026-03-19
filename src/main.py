@@ -2,250 +2,28 @@ import argparse
 import asyncio
 import json
 import os
-import threading
-import traceback
 import logging
-from typing import Any, Dict, Iterable, AsyncIterable, AsyncGenerator, Optional
-import cozeloop
+from typing import Any, Dict
 import uvicorn
-import time
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from langchain_core.runnables import RunnableConfig
-from langgraph.graph import StateGraph, END
-from langgraph.graph.state import CompiledStateGraph
-from coze_coding_utils.runtime_ctx.context import new_context, Context
-from coze_coding_utils.helper import graph_helper
-from coze_coding_utils.log.node_log import LOG_FILE
-from coze_coding_utils.log.write_log import setup_logging, request_context
-from coze_coding_utils.log.config import LOG_LEVEL
-from coze_coding_utils.error.classifier import ErrorClassifier, classify_error
-from coze_coding_utils.helper.stream_runner import AgentStreamRunner, WorkflowStreamRunner,agent_stream_handler,workflow_stream_handler, RunOpt
+from fastapi.responses import JSONResponse, HTMLResponse
 
-setup_logging(
-    log_file=LOG_FILE,
-    max_bytes=100 * 1024 * 1024, # 100MB
-    backup_count=5,
-    log_level=LOG_LEVEL,
-    use_json_format=True,
-    console_output=True
-)
-
+# 基础日志配置
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-from coze_coding_utils.helper.agent_helper import to_stream_input
-from coze_coding_utils.openai.handler import OpenAIChatHandler
-from coze_coding_utils.log.parser import LangGraphParser
-from coze_coding_utils.log.err_trace import extract_core_stack
-from coze_coding_utils.log.loop_trace import init_run_config, init_agent_config
 
-
-# 超时配置常量
-TIMEOUT_SECONDS = 900  # 15分钟
-
-class GraphService:
-    def __init__(self):
-        # 用于跟踪正在运行的任务（使用asyncio.Task）
-        self.running_tasks: Dict[str, asyncio.Task] = {}
-        # 错误分类器
-        self.error_classifier = ErrorClassifier()
-        # stream runner
-        self._agent_stream_runner = AgentStreamRunner()
-        self._workflow_stream_runner = WorkflowStreamRunner()
-        self._graph = None
-        self._graph_lock = threading.Lock()
-
-    def _get_graph(self, ctx=Context):
-        if graph_helper.is_agent_proj():
-            return graph_helper.get_agent_instance("agents.agent", ctx)
-
-        if self._graph is not None:
-            return self._graph
-        with self._graph_lock:
-            if self._graph is not None:
-                return self._graph
-            self._graph = graph_helper.get_graph_instance("graphs.graph")
-            return self._graph
-
-    @staticmethod
-    def _sse_event(data: Any, event_id: Any = None) -> str:
-        id_line = f"id: {event_id}\n" if event_id else ""
-        return f"{id_line}event: message\ndata: {json.dumps(data, ensure_ascii=False, default=str)}\n\n"
-
-    def _get_stream_runner(self):
-        if graph_helper.is_agent_proj():
-            return self._agent_stream_runner
-        else:
-            return self._workflow_stream_runner
-
-    # 流式运行（原始迭代器）：本地调用使用
-    def stream(self, payload: Dict[str, Any], run_config: RunnableConfig, ctx=Context) -> Iterable[Any]:
-        graph = self._get_graph(ctx)
-        stream_runner = self._get_stream_runner()
-        for chunk in stream_runner.stream(payload, graph, run_config, ctx):
-            yield chunk
-
-    # 同步运行：本地/HTTP 通用
-    async def run(self, payload: Dict[str, Any], ctx=None) -> Dict[str, Any]:
-        if ctx is None:
-            ctx = new_context("run")
-
-        run_id = ctx.run_id
-        logger.info(f"Starting run with run_id: {run_id}")
-
-        try:
-            graph = self._get_graph(ctx)
-            # custom tracer
-            run_config = init_run_config(graph, ctx)
-            run_config["configurable"] = {"thread_id": ctx.run_id}
-
-            # 直接调用，LangGraph会在当前任务上下文中执行
-            # 如果当前任务被取消，LangGraph的执行也会被取消
-            return await graph.ainvoke(payload, config=run_config, context=ctx)
-
-        except asyncio.CancelledError:
-            logger.info(f"Run {run_id} was cancelled")
-            return {"status": "cancelled", "run_id": run_id, "message": "Execution was cancelled"}
-        except Exception as e:
-            # 使用错误分类器分类错误
-            err = self.error_classifier.classify(e, {"node_name": "run", "run_id": run_id})
-            # 记录详细的错误信息和堆栈跟踪
-            logger.error(
-                f"Error in GraphService.run: [{err.code}] {err.message}\n"
-                f"Category: {err.category.name}\n"
-                f"Traceback:\n{extract_core_stack()}"
-            )
-            # 保留原始异常堆栈，便于上层返回真正的报错位置
-            raise
-        finally:
-            # 清理任务记录
-            self.running_tasks.pop(run_id, None)
-
-    # 流式运行（SSE 格式化）：HTTP 路由使用
-    async def stream_sse(self, payload: Dict[str, Any], ctx=None, run_opt: Optional[RunOpt] = None) -> AsyncGenerator[str, None]:
-        if ctx is None:
-            ctx = new_context(method="stream_sse")
-        if run_opt is None:
-            run_opt = RunOpt()
-
-        run_id = ctx.run_id
-        logger.info(f"Starting stream with run_id: {run_id}")
-        graph = self._get_graph(ctx)
-        if graph_helper.is_agent_proj():
-            run_config = init_agent_config(graph, ctx)
-        else:
-            run_config = init_run_config(graph, ctx)  # vibeflow
-
-        is_workflow = not graph_helper.is_agent_proj()
-
-        try:
-            async for chunk in self.astream(payload, graph, run_config=run_config, ctx=ctx, run_opt=run_opt):
-                if is_workflow and isinstance(chunk, tuple):
-                    event_id, data = chunk
-                    yield self._sse_event(data, event_id)
-                else:
-                    yield self._sse_event(chunk)
-        finally:
-            # 清理任务记录
-            self.running_tasks.pop(run_id, None)
-            cozeloop.flush()
-
-    # 取消执行 - 使用asyncio的标准方式
-    def cancel_run(self, run_id: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
-        """
-        取消指定run_id的执行
-
-        使用asyncio.Task.cancel()来取消任务,这是标准的Python异步取消机制。
-        LangGraph会在节点之间检查CancelledError,实现优雅的取消。
-        """
-        logger.info(f"Attempting to cancel run_id: {run_id}")
-
-        # 查找对应的任务
-        if run_id in self.running_tasks:
-            task = self.running_tasks[run_id]
-            if not task.done():
-                # 使用asyncio的标准取消机制
-                # 这会在下一个await点抛出CancelledError
-                task.cancel()
-                logger.info(f"Cancellation requested for run_id: {run_id}")
-                return {
-                    "status": "success",
-                    "run_id": run_id,
-                    "message": "Cancellation signal sent, task will be cancelled at next await point"
-                }
-            else:
-                logger.info(f"Task already completed for run_id: {run_id}")
-                return {
-                    "status": "already_completed",
-                    "run_id": run_id,
-                    "message": "Task has already completed"
-                }
-        else:
-            logger.warning(f"No active task found for run_id: {run_id}")
-            return {
-                "status": "not_found",
-                "run_id": run_id,
-                "message": "No active task found with this run_id. Task may have already completed or run_id is invalid."
-            }
-
-    # 运行指定节点：本地/HTTP 通用
-    async def run_node(self, node_id: str, payload: Dict[str, Any], ctx=None) -> Any:
-        if ctx is None or Context.run_id == "":
-            ctx = new_context(method="node_run")
-
-        _graph = self._get_graph()
-        node_func, input_cls, output_cls = graph_helper.get_graph_node_func_with_inout(_graph.get_graph(), node_id)
-        if node_func is None or input_cls is None:
-            raise KeyError(f"node_id '{node_id}' not found")
-
-        parser = LangGraphParser(_graph)
-        metadata = parser.get_node_metadata(node_id) or {}
-
-        _g = StateGraph(input_cls, input_schema=input_cls, output_schema=output_cls)
-        _g.add_node("sn", node_func, metadata=metadata)
-        _g.set_entry_point("sn")
-        _g.add_edge("sn", END)
-        _graph = _g.compile()
-
-        run_config = init_run_config(_graph, ctx)
-        return await _graph.ainvoke(payload, config=run_config)
-
-    def graph_inout_schema(self) -> Any:
-        if graph_helper.is_agent_proj():
-            return {"input_schema": {}, "output_schema": {}}
-        builder = getattr(self._get_graph(), 'builder', None)
-        if builder is not None:
-            input_cls = getattr(builder, 'input_schema', None) or self.graph.get_input_schema()
-            output_cls = getattr(builder, 'output_schema', None) or self.graph.get_output_schema()
-        else:
-            logger.warning(f"No builder input schema found for graph_inout_schema, using graph input schema instead")
-            input_cls = self.graph.get_input_schema()
-            output_cls = self.graph.get_output_schema()
-
-        return {
-            "input_schema": input_cls.model_json_schema(), 
-            "output_schema": output_cls.model_json_schema(),
-            "code":0,
-            "msg":""
-        }
-
-    async def astream(self, payload: Dict[str, Any], graph: CompiledStateGraph, run_config: RunnableConfig, ctx=Context, run_opt: Optional[RunOpt] = None) -> AsyncIterable[Any]:
-        stream_runner = self._get_stream_runner()
-        async for chunk in stream_runner.astream(payload, graph, run_config, ctx, run_opt):
-            yield chunk
-
-
-service = GraphService()
+# 创建 FastAPI 应用
 app = FastAPI()
 
-# 决策炼金师页面路由
+# 超时配置
+TIMEOUT_SECONDS = 900
+
+
 def _get_html_path():
     """获取HTML文件的绝对路径"""
-    # 尝试多种路径
     possible_paths = [
         os.path.join(os.getcwd(), "assets/pages/index.html"),
-        os.path.join(os.path.dirname(__file__), "../assets/pages/index.html"),
-        "/app/assets/pages/index.html",  # Railway 部署路径
+        "/app/assets/pages/index.html",
         "/workspace/projects/assets/pages/index.html",
     ]
     
@@ -254,8 +32,11 @@ def _get_html_path():
             logger.info(f"Found HTML file at: {path}")
             return path
     
-    logger.error(f"HTML file not found in any of: {possible_paths}")
+    logger.error(f"HTML file not found")
     return None
+
+
+# ===== 路由定义 =====
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -271,6 +52,7 @@ async def root():
         logger.error(f"Error reading HTML file: {e}")
         return HTMLResponse(content=f"<h1>页面加载错误: {str(e)}</h1>", status_code=500)
 
+
 @app.get("/alchemist", response_class=HTMLResponse)
 async def alchemist_page():
     """决策炼金师页面"""
@@ -285,620 +67,68 @@ async def alchemist_page():
         logger.error(f"Error reading HTML file: {e}")
         return HTMLResponse(content=f"<h1>页面加载错误: {str(e)}</h1>", status_code=500)
 
-# OpenAI 兼容接口处理器
-openai_handler = OpenAIChatHandler(service)
-
-
-HEADER_X_RUN_ID = "x-run-id"
-
-# 决策炼金师对话API
-@app.post("/alchemist/chat")
-async def alchemist_chat(request: Request):
-    """决策炼金师对话接口"""
-    ctx = new_context(method="alchemist_chat", headers=request.headers)
-    request_context.set(ctx)
-    
-    try:
-        payload = await request.json()
-        message = payload.get("message", "")
-        session_id = payload.get("session_id", "default")
-        messages_history = payload.get("messages", [])  # 接收对话历史
-        
-        if not message:
-            raise HTTPException(status_code=400, detail="消息不能为空")
-        
-        # 调用Agent处理
-        from agents.agent import build_agent
-        agent = build_agent(ctx)
-        
-        run_config = init_agent_config(agent, ctx)
-        run_config["configurable"] = {"thread_id": session_id}
-        
-        # 构建完整的消息列表
-        all_messages = []
-        
-        # 添加历史消息
-        for msg in messages_history:
-            role = msg.get("role", "user")
-            content = msg.get("content", "")
-            if role == "user":
-                all_messages.append({"type": "human", "content": content})
-            elif role == "assistant":
-                all_messages.append({"type": "ai", "content": content})
-        
-        # 添加当前消息
-        all_messages.append({"type": "human", "content": message})
-        
-        # 准备输入
-        input_data = {
-            "messages": all_messages
-        }
-        
-        # 调用Agent
-        result = await agent.ainvoke(input_data, config=run_config, context=ctx)
-        
-        # 提取响应
-        messages = result.get("messages", [])
-        response_text = ""
-        if messages:
-            last_message = messages[-1]
-            response_text = last_message.content if hasattr(last_message, 'content') else str(last_message)
-        
-        return {
-            "status": "success",
-            "message": response_text,
-            "session_id": session_id,
-            "run_id": ctx.run_id
-        }
-        
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error in alchemist_chat: {e}")
-        raise HTTPException(status_code=400, detail="Invalid JSON format")
-    except Exception as e:
-        logger.error(f"Error in alchemist_chat: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cozeloop.flush()
-
-@app.post("/run")
-async def http_run(request: Request) -> Dict[str, Any]:
-    global result
-    raw_body = await request.body()
-    try:
-        body_text = raw_body.decode("utf-8")
-    except Exception as e:
-        body_text = str(raw_body)
-        raise HTTPException(status_code=400,
-                            detail=f"Invalid JSON format: {body_text}, traceback: {traceback.format_exc()}, error: {e}")
-
-    ctx = new_context(method="run", headers=request.headers)
-    # 优先使用上游指定的 run_id，保证 cancel 能精确匹配
-    upstream_run_id = request.headers.get(HEADER_X_RUN_ID)
-    if upstream_run_id:
-        ctx.run_id = upstream_run_id
-    run_id = ctx.run_id
-    request_context.set(ctx)
-
-    logger.info(
-        f"Received request for /run: "
-        f"run_id={run_id}, "
-        f"query={dict(request.query_params)}, "
-        f"body={body_text}"
-    )
-
-    try:
-        payload = await request.json()
-
-        # 创建任务并记录 - 这是关键，让我们可以通过run_id取消任务
-        task = asyncio.create_task(service.run(payload, ctx))
-        service.running_tasks[run_id] = task
-
-        try:
-            result = await asyncio.wait_for(task, timeout=float(TIMEOUT_SECONDS))
-        except asyncio.TimeoutError:
-            logger.error(f"Run execution timeout after {TIMEOUT_SECONDS}s for run_id: {run_id}")
-            task.cancel()
-            try:
-                result = await task
-            except asyncio.CancelledError:
-                return {
-                    "status": "timeout",
-                    "run_id": run_id,
-                    "message": f"Execution timeout: exceeded {TIMEOUT_SECONDS} seconds"
-                }
-
-        if not result:
-            result = {}
-        if isinstance(result, dict):
-            result["run_id"] = run_id
-        return result
-
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error in http_run: {e}, traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=400, detail=f"Invalid JSON format, {extract_core_stack()}")
-
-    except asyncio.CancelledError:
-        logger.info(f"Request cancelled for run_id: {run_id}")
-        result = {"status": "cancelled", "run_id": run_id, "message": "Execution was cancelled"}
-        return result
-
-    except Exception as e:
-        # 使用错误分类器获取错误信息
-        error_response = service.error_classifier.get_error_response(e, {"node_name": "http_run", "run_id": run_id})
-        logger.error(
-            f"Unexpected error in http_run: [{error_response['error_code']}] {error_response['error_message']}, "
-            f"traceback: {traceback.format_exc()}", exc_info=True
-        )
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "error_code": error_response["error_code"],
-                "error_message": error_response["error_message"],
-                "stack_trace": extract_core_stack(),
-            }
-        )
-    finally:
-        cozeloop.flush()
-
-
-HEADER_X_WORKFLOW_STREAM_MODE = "x-workflow-stream-mode"
-
-
-def _register_task(run_id: str, task: asyncio.Task):
-    service.running_tasks[run_id] = task
-
-
-@app.post("/stream_run")
-async def http_stream_run(request: Request):
-    ctx = new_context(method="stream_run", headers=request.headers)
-    # 优先使用上游指定的 run_id，保证 cancel 能精确匹配
-    upstream_run_id = request.headers.get(HEADER_X_RUN_ID)
-    if upstream_run_id:
-        ctx.run_id = upstream_run_id
-    workflow_stream_mode = request.headers.get(HEADER_X_WORKFLOW_STREAM_MODE, "").lower()
-    workflow_debug = workflow_stream_mode == "debug"
-    request_context.set(ctx)
-    raw_body = await request.body()
-    try:
-        body_text = raw_body.decode("utf-8")
-    except Exception as e:
-        body_text = str(raw_body)
-        raise HTTPException(status_code=400,
-                            detail=f"Invalid JSON format: {body_text}, traceback: {extract_core_stack()}, error: {e}")
-    run_id = ctx.run_id
-    is_agent = graph_helper.is_agent_proj()
-    logger.info(
-        f"Received request for /stream_run: "
-        f"run_id={run_id}, "
-        f"is_agent_project={is_agent}, "
-        f"query={dict(request.query_params)}, "
-        f"body={body_text}"
-    )
-    try:
-        payload = await request.json()
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error in http_stream_run: {e}, traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=400, detail=f"Invalid JSON format:{extract_core_stack()}")
-
-    if is_agent:
-        stream_generator = agent_stream_handler(
-            payload=payload,
-            ctx=ctx,
-            run_id=run_id,
-            stream_sse_func=service.stream_sse,
-            sse_event_func=service._sse_event,
-            error_classifier=service.error_classifier,
-            register_task_func=_register_task,
-        )
-    else:
-        stream_generator = workflow_stream_handler(
-            payload=payload,
-            ctx=ctx,
-            run_id=run_id,
-            stream_sse_func=service.stream_sse,
-            sse_event_func=service._sse_event,
-            error_classifier=service.error_classifier,
-            register_task_func=_register_task,
-            run_opt=RunOpt(workflow_debug=workflow_debug),
-        )
-
-    response = StreamingResponse(stream_generator, media_type="text/event-stream")
-    return response
-
-@app.post("/cancel/{run_id}")
-async def http_cancel(run_id: str, request: Request):
-    """
-    取消指定run_id的执行
-
-    使用asyncio.Task.cancel()实现取消,这是Python标准的异步任务取消机制。
-    LangGraph会在节点之间的await点检查CancelledError,实现优雅取消。
-    """
-    ctx = new_context(method="cancel", headers=request.headers)
-    request_context.set(ctx)
-    logger.info(f"Received cancel request for run_id: {run_id}")
-    result = service.cancel_run(run_id, ctx)
-    return result
-
-
-@app.post(path="/node_run/{node_id}")
-async def http_node_run(node_id: str, request: Request):
-    raw_body = await request.body()
-    try:
-        body_text = raw_body.decode("utf-8")
-    except UnicodeDecodeError:
-        body_text = str(raw_body)
-        raise HTTPException(status_code=400, detail=f"Invalid JSON format: {body_text}")
-    ctx = new_context(method="node_run", headers=request.headers)
-    request_context.set(ctx)
-    logger.info(
-        f"Received request for /node_run/{node_id}: "
-        f"query={dict(request.query_params)}, "
-        f"body={body_text}",
-    )
-
-    try:
-        payload = await request.json()
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error in http_node_run: {e}, traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=400, detail=f"Invalid JSON format:{extract_core_stack()}")
-    try:
-        return await service.run_node(node_id, payload, ctx)
-    except KeyError:
-        raise HTTPException(status_code=404,
-                            detail=f"node_id '{node_id}' not found or input miss required fields, traceback: {extract_core_stack()}")
-    except Exception as e:
-        # 使用错误分类器获取错误信息
-        error_response = service.error_classifier.get_error_response(e, {"node_name": node_id})
-        logger.error(
-            f"Unexpected error in http_node_run: [{error_response['error_code']}] {error_response['error_message']}, "
-            f"traceback: {traceback.format_exc()}", exc_info=True
-        )
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "error_code": error_response["error_code"],
-                "error_message": error_response["error_message"],
-                "stack_trace": extract_core_stack(),
-            }
-        )
-    finally:
-        cozeloop.flush()
-
-
-@app.post("/v1/chat/completions")
-async def openai_chat_completions(request: Request):
-    """OpenAI Chat Completions API 兼容接口"""
-    ctx = new_context(method="openai_chat", headers=request.headers)
-    request_context.set(ctx)
-
-    logger.info(f"Received request for /v1/chat/completions: run_id={ctx.run_id}")
-
-    try:
-        payload = await request.json()
-        return await openai_handler.handle(payload, ctx)
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error in openai_chat_completions: {e}")
-        raise HTTPException(status_code=400, detail="Invalid JSON format")
-    finally:
-        cozeloop.flush()
-
 
 @app.get("/health")
 async def health_check():
-    try:
-        # 这里可以添加更多的健康检查逻辑
-        return {
-            "status": "ok",
-            "message": "Service is running",
-        }
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    """健康检查"""
+    return {
+        "status": "ok",
+        "message": "Service is running",
+    }
 
 
 @app.get("/debug")
 async def debug_info():
-    """调试端点 - 显示环境信息"""
-    import sys
-    
+    """调试端点"""
     html_path = _get_html_path()
     
     return {
         "cwd": os.getcwd(),
-        "env_workspace": os.getenv("COZE_WORKSPACE_PATH", "未设置"),
-        "python_path": sys.path[:5],
         "html_path_found": html_path,
         "assets_exists": os.path.exists("assets/pages/index.html"),
         "app_assets_exists": os.path.exists("/app/assets/pages/index.html"),
-        "workspace_assets_exists": os.path.exists("/workspace/projects/assets/pages/index.html"),
         "current_file": __file__,
-        "list_cwd": os.listdir(".")[:10],
-        "list_app": os.listdir("/app")[:10] if os.path.exists("/app") else "/app 不存在",
     }
 
 
-# ============ 运营数据统计API ============
-from datetime import datetime, timedelta
-from collections import defaultdict
-import threading
-
-# 内存存储统计数据（生产环境应使用数据库）
-_stats_lock = threading.Lock()
-_stats_data = {
-    "total_visits": 0,
-    "today_visits": 0,
-    "week_visits": 0,
-    "total_users": set(),
-    "today_users": set(),
-    "returning_users": set(),
-    "total_outputs": 0,
-    "today_outputs": 0,
-    "total_rewards": 0,
-    "today_rewards": 0,
-    "funnel_start": 0,
-    "funnel_topic": 0,
-    "funnel_rules": 0,
-    "funnel_output": 0,
-    "hot_topics": defaultdict(int),
-    "last_reset_date": datetime.now().date().isoformat()
-}
-
-def _reset_daily_stats():
-    """每日重置统计"""
-    global _stats_data
-    with _stats_lock:
-        today = datetime.now().date().isoformat()
-        if _stats_data["last_reset_date"] != today:
-            _stats_data["today_visits"] = 0
-            _stats_data["today_users"] = set()
-            _stats_data["today_outputs"] = 0
-            _stats_data["today_rewards"] = 0
-            _stats_data["last_reset_date"] = today
-
-@app.post("/api/stats/visit")
-async def track_visit(request: Request):
-    """记录访问"""
+@app.post("/alchemist/chat")
+async def alchemist_chat(request: Request):
+    """决策炼金师对话接口"""
     try:
-        _reset_daily_stats()
         payload = await request.json()
-        session_id = payload.get("sessionId", "unknown")
+        message = payload.get("message", "")
         
-        with _stats_lock:
-            _stats_data["total_visits"] += 1
-            _stats_data["today_visits"] += 1
-            _stats_data["week_visits"] += 1
-            
-            # 用户统计
-            if session_id not in _stats_data["total_users"]:
-                _stats_data["total_users"].add(session_id)
-            else:
-                _stats_data["returning_users"].add(session_id)
-            
-            _stats_data["today_users"].add(session_id)
+        if not message:
+            raise HTTPException(status_code=400, detail="消息不能为空")
         
-        return {"status": "success"}
-    except Exception as e:
-        logger.error(f"Error tracking visit: {e}")
-        return {"status": "error"}
-
-@app.post("/api/stats/complete")
-async def track_complete(request: Request):
-    """记录完成产出"""
-    try:
-        _reset_daily_stats()
-        payload = await request.json()
-        session_id = payload.get("sessionId", "unknown")
-        mode = payload.get("mode", "quick")
-        
-        with _stats_lock:
-            _stats_data["total_outputs"] += 1
-            _stats_data["today_outputs"] += 1
-            _stats_data["funnel_output"] += 1
-        
-        return {"status": "success"}
-    except Exception as e:
-        logger.error(f"Error tracking complete: {e}")
-        return {"status": "error"}
-
-@app.post("/api/stats/reward")
-async def track_reward(request: Request):
-    """记录打赏开通"""
-    try:
-        _reset_daily_stats()
-        payload = await request.json()
-        
-        with _stats_lock:
-            _stats_data["total_rewards"] += 1
-            _stats_data["today_rewards"] += 1
-        
-        return {"status": "success"}
-    except Exception as e:
-        logger.error(f"Error tracking reward: {e}")
-        return {"status": "error"}
-
-@app.post("/api/stats/funnel")
-async def track_funnel(request: Request):
-    """记录漏斗阶段"""
-    try:
-        _reset_daily_stats()
-        payload = await request.json()
-        stage = payload.get("stage", "")  # start, topic, rules, output
-        
-        with _stats_lock:
-            if stage == "start":
-                _stats_data["funnel_start"] += 1
-            elif stage == "topic":
-                _stats_data["funnel_topic"] += 1
-            elif stage == "rules":
-                _stats_data["funnel_rules"] += 1
-            elif stage == "output":
-                _stats_data["funnel_output"] += 1
-        
-        return {"status": "success"}
-    except Exception as e:
-        logger.error(f"Error tracking funnel: {e}")
-        return {"status": "error"}
-
-@app.get("/api/stats/data")
-async def get_stats_data():
-    """获取统计数据"""
-    try:
-        _reset_daily_stats()
-        
-        with _stats_lock:
-            data = {
-                "totalVisits": _stats_data["total_visits"],
-                "todayVisits": _stats_data["today_visits"],
-                "weekVisits": _stats_data["week_visits"],
-                "totalUsers": len(_stats_data["total_users"]),
-                "todayUsers": len(_stats_data["today_users"]),
-                "returningUsers": len(_stats_data["returning_users"]),
-                "totalOutputs": _stats_data["total_outputs"],
-                "todayOutputs": _stats_data["today_outputs"],
-                "rewardRate": round(_stats_data["total_rewards"] / max(_stats_data["total_outputs"], 1) * 100, 1),
-                "completeRate": round(_stats_data["funnel_output"] / max(_stats_data["total_visits"], 1) * 100, 1),
-                "funnelStart": _stats_data["funnel_start"],
-                "funnelTopic": _stats_data["funnel_topic"],
-                "funnelRules": _stats_data["funnel_rules"],
-                "funnelOutput": _stats_data["funnel_output"],
-            }
-        
-        return data
-    except Exception as e:
-        logger.error(f"Error getting stats data: {e}")
-        return {"error": str(e)}
-
-@app.post("/alchemist/upload")
-async def upload_file(request: Request):
-    """文件上传处理"""
-    try:
-        form = await request.form()
-        file = form.get("file")
-        session_id = form.get("session_id", "default")
-        
-        if not file:
-            raise HTTPException(status_code=400, detail="没有上传文件")
-        
-        # 读取文件内容
-        content = await file.read()
-        filename = file.filename
-        file_type = file.content_type
-        
-        logger.info(f"File uploaded: {filename}, type: {file_type}, size: {len(content)}")
-        
-        # 更新漏斗统计
-        with _stats_lock:
-            _stats_data["funnel_start"] += 1
-        
-        # 返回处理结果
+        # 简化版：直接返回固定响应
         return {
             "status": "success",
-            "message": f"""📎 我已收到您的文件 **{filename}**
-
-让我来帮您分析一下其中的亮点：
-
-**请您再补充1-2个您最自豪的项目或成就**（包括背景、您的角色、数据结果），这样我可以更全面地了解您的专业领域。
-
-或者，您可以直接告诉我：
-- 您在工作中最常被请教哪类问题？
-- 有什么是您一眼就能看穿、别人却觉得复杂的问题？"""
+            "message": f"收到您的消息：{message}\n\n系统正在初始化中，请稍后再试。",
+            "session_id": "default",
         }
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {e}")
+        raise HTTPException(status_code=400, detail="Invalid JSON format")
     except Exception as e:
-        logger.error(f"Error uploading file: {e}")
-        return {"status": "error", "message": "文件处理失败，请重试"}
-
-@app.post("/alchemist/reward")
-async def upload_reward_qr(request: Request):
-    """上传收款二维码"""
-    try:
-        form = await request.form()
-        file = form.get("qr_code")
-        session_id = form.get("session_id", "default")
-        
-        if not file:
-            raise HTTPException(status_code=400, detail="没有上传文件")
-        
-        # 读取文件
-        content = await file.read()
-        
-        logger.info(f"Reward QR uploaded: session={session_id}, size={len(content)}")
-        
-        # 更新打赏统计
-        with _stats_lock:
-            _stats_data["total_rewards"] += 1
-            _stats_data["today_rewards"] += 1
-        
-        return {"status": "success", "message": "收款码上传成功"}
-    except Exception as e:
-        logger.error(f"Error uploading reward QR: {e}")
-        return {"status": "error", "message": "上传失败"}
+        logger.error(f"Error in alchemist_chat: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get(path="/graph_parameter")
-async def http_graph_inout_parameter(request: Request):
-    return service.graph_inout_schema()
+# ===== 启动函数 =====
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Start FastAPI server")
-    parser.add_argument("-m", type=str, default="http", help="Run mode, support http,flow,node")
-    parser.add_argument("-n", type=str, default="", help="Node ID for single node run")
     parser.add_argument("-p", type=int, default=5000, help="HTTP server port")
-    parser.add_argument("-i", type=str, default="", help="Input JSON string for flow/node mode")
     return parser.parse_args()
 
 
-def parse_input(input_str: str) -> Dict[str, Any]:
-    """Parse input string, support both JSON string and plain text"""
-    if not input_str:
-        return {"text": "你好"}
-
-    # Try to parse as JSON first
-    try:
-        return json.loads(input_str)
-    except json.JSONDecodeError:
-        # If not valid JSON, treat as plain text
-        return {"text": input_str}
-
 def start_http_server(port):
-    workers = 1
-    reload = False
-    if graph_helper.is_dev_env():
-        reload = True
+    logger.info(f"Start HTTP Server on port: {port}")
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False, workers=1)
 
-    logger.info(f"Start HTTP Server, Port: {port}, Workers: {workers}")
-    # 使用完整的模块路径，确保在任何工作目录下都能正确启动
-    uvicorn.run("src.main:app", host="0.0.0.0", port=port, reload=reload, workers=workers)
 
 if __name__ == "__main__":
     args = parse_args()
-    if args.m == "http":
-        start_http_server(args.p)
-    elif args.m == "flow":
-        payload = parse_input(args.i)
-        result = asyncio.run(service.run(payload))
-        print(json.dumps(result, ensure_ascii=False, indent=2))
-    elif args.m == "node" and args.n:
-        payload = parse_input(args.i)
-        result = asyncio.run(service.run_node(args.n, payload))
-        print(json.dumps(result, ensure_ascii=False, indent=2))
-    elif args.m == "agent":
-        agent_ctx = new_context(method="agent")
-        for chunk in service.stream(
-                {
-                    "type": "query",
-                    "session_id": "1",
-                    "message": "你好",
-                    "content": {
-                        "query": {
-                            "prompt": [
-                                {
-                                    "type": "text",
-                                    "content": {"text": "现在几点了？请调用工具获取当前时间"},
-                                }
-                            ]
-                        }
-                    },
-                },
-                run_config={"configurable": {"session_id": "1"}},
-                ctx=agent_ctx,
-        ):
-            print(chunk)
+    start_http_server(args.p)
