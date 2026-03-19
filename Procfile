@@ -1,1 +1,1 @@
-web: mkdir -p /app/work/logs/bypass && cd /app && uvicorn src.main:app --host 0.0.0.0 --port $PORT
+web: mkdir -p /app/work/logs/bypass && echo "=== Starting application ===" && echo "PWD: $(pwd)" && echo "Files in current dir:" && ls -la && echo "Files in /app:" && ls -la /app 2>/dev/null || echo "/app not found" && echo "Starting uvicorn..." && uvicorn src.main:app --host 0.0.0.0 --port $PORT
