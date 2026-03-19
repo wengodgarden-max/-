@@ -239,27 +239,51 @@ service = GraphService()
 app = FastAPI()
 
 # 决策炼金师页面路由
+def _get_html_path():
+    """获取HTML文件的绝对路径"""
+    # 尝试多种路径
+    possible_paths = [
+        os.path.join(os.getcwd(), "assets/pages/index.html"),
+        os.path.join(os.path.dirname(__file__), "../assets/pages/index.html"),
+        "/app/assets/pages/index.html",  # Railway 部署路径
+        "/workspace/projects/assets/pages/index.html",
+    ]
+    
+    for path in possible_paths:
+        if os.path.exists(path):
+            logger.info(f"Found HTML file at: {path}")
+            return path
+    
+    logger.error(f"HTML file not found in any of: {possible_paths}")
+    return None
+
 @app.get("/", response_class=HTMLResponse)
 async def root():
     """决策炼金师首页"""
-    workspace_path = os.getenv("COZE_WORKSPACE_PATH", "/workspace/projects")
-    html_path = os.path.join(workspace_path, "assets/pages/index.html")
+    html_path = _get_html_path()
+    if not html_path:
+        return HTMLResponse(content="<h1>页面未找到 - HTML文件不存在</h1>", status_code=404)
+    
     try:
         with open(html_path, 'r', encoding='utf-8') as f:
             return HTMLResponse(content=f.read(), status_code=200)
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>页面未找到</h1>", status_code=404)
+    except Exception as e:
+        logger.error(f"Error reading HTML file: {e}")
+        return HTMLResponse(content=f"<h1>页面加载错误: {str(e)}</h1>", status_code=500)
 
 @app.get("/alchemist", response_class=HTMLResponse)
 async def alchemist_page():
     """决策炼金师页面"""
-    workspace_path = os.getenv("COZE_WORKSPACE_PATH", "/workspace/projects")
-    html_path = os.path.join(workspace_path, "assets/pages/index.html")
+    html_path = _get_html_path()
+    if not html_path:
+        return HTMLResponse(content="<h1>页面未找到 - HTML文件不存在</h1>", status_code=404)
+    
     try:
         with open(html_path, 'r', encoding='utf-8') as f:
             return HTMLResponse(content=f.read(), status_code=200)
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>页面未找到</h1>", status_code=404)
+    except Exception as e:
+        logger.error(f"Error reading HTML file: {e}")
+        return HTMLResponse(content=f"<h1>页面加载错误: {str(e)}</h1>", status_code=500)
 
 # OpenAI 兼容接口处理器
 openai_handler = OpenAIChatHandler(service)
