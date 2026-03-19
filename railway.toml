@@ -2,7 +2,7 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "cd /app && uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+startCommand = "python -m uvicorn main:app --host 0.0.0.0 --port $PORT --app-dir src"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
