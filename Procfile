@@ -1,1 +1,1 @@
-web: mkdir -p /app/work/logs/bypass && python src/main.py -p $PORT
+web: mkdir -p /app/work/logs/bypass && cd /app && uvicorn src.main:app --host 0.0.0.0 --port $PORT
