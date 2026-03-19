@@ -595,6 +595,27 @@ async def health_check():
         raise HTTPException(status_code=503, detail=str(e))
 
 
+@app.get("/debug")
+async def debug_info():
+    """调试端点 - 显示环境信息"""
+    import sys
+    
+    html_path = _get_html_path()
+    
+    return {
+        "cwd": os.getcwd(),
+        "env_workspace": os.getenv("COZE_WORKSPACE_PATH", "未设置"),
+        "python_path": sys.path[:5],
+        "html_path_found": html_path,
+        "assets_exists": os.path.exists("assets/pages/index.html"),
+        "app_assets_exists": os.path.exists("/app/assets/pages/index.html"),
+        "workspace_assets_exists": os.path.exists("/workspace/projects/assets/pages/index.html"),
+        "current_file": __file__,
+        "list_cwd": os.listdir(".")[:10],
+        "list_app": os.listdir("/app")[:10] if os.path.exists("/app") else "/app 不存在",
+    }
+
+
 # ============ 运营数据统计API ============
 from datetime import datetime, timedelta
 from collections import defaultdict
