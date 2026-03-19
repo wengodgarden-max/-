@@ -1,1 +1,1 @@
-web: python src/main.py -p $PORT
+web: mkdir -p /app/work/logs/bypass && python src/main.py -p $PORT
