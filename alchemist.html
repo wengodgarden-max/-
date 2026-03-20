@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炼金师助手 - 知识变现专家</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+        .content { padding: 40px; }
+        .feature-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .feature-box h3 { color: #667eea; margin-bottom: 10px; }
+        .chat-container {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+        .assistant-message {
+            background: #f8f9fa;
+            color: #333;
+        }
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .chat-input button {
+            margin-left: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .chat-input button:hover {
+            transform: scale(1.05);
+        }
+        .pricing {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .pricing-card {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .pricing-card h4 { color: #667eea; font-size: 1.5em; }
+        .pricing-card .price { font-size: 2em; color: #764ba2; margin: 10px 0; font-weight: bold; }
+        .pricing-card ul { list-style: none; margin-top: 15px; }
+        .pricing-card li { padding: 5px 0; color: #666; }
+        .contact-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .contact-box h3 { font-size: 1.5em; margin-bottom: 15px; }
+        .contact-box p { font-size: 1.1em; margin: 10px 0; }
+        .contact-box a { color: #fff; text-decoration: underline; }
+        .typing {
+            display: inline-block;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .steps {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .steps h4 { color: #856404; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧙‍♂️ 炼金师助手</h1>
+            <p>帮助你把隐性经验转化为可出售的知识产品</p>
+        </div>
+        
+        <div class="content">
+            <div class="feature-box">
+                <h3>✨ 核心功能</h3>
+                <p style="font-size: 1.1em; line-height: 1.8;">
+                    📋 <strong>知识资产盘点</strong> → 
+                    💡 <strong>选题价值评估</strong> → 
+                    🤖 <strong>Agent 提示词生成</strong> → 
+                    📦 <strong>完整产出包</strong>
+                </p>
+            </div>
+
+            <div class="steps">
+                <h4>🎯 如何开始？</h4>
+                <p>1️⃣ 在下方输入框告诉我你的专业领域</p>
+                <p>2️⃣ 我会引导你盘点知识资产</p>
+                <p>3️⃣ 帮你评估最有价值的选题方向</p>
+                <p>4️⃣ 生成可直接使用的 AI Agent 提示词</p>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant-message">
+                        👋 你好！我是炼金师助手。<br><br>
+                        我可以帮助你：<br>
+                        • 📋 盘点你的知识资产<br>
+                        • 💡 评估选题的市场价值<br>
+                        • 🤖 生成 AI Agent 提示词<br>
+                        • 📦 创建完整的知识产品<br><br>
+                        <strong>请告诉我：你最擅长什么？或者你想在哪个领域变现？</strong><br><br>
+                        例如：<br>
+                        • "我是一名产品经理，擅长需求分析"<br>
+                        • "我教英语，想开发一个AI口语陪练"<br>
+                        • "我是健身教练，想做知识付费课程"
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="userInput" placeholder="输入你的问题或专业领域..." onkeypress="if(event.key==='Enter')sendMessage()">
+                    <button onclick="sendMessage()">发送</button>
+                </div>
+            </div>
+            
+            <div class="pricing">
+                <div class="pricing-card">
+                    <h4>🌱 体验版</h4>
+                    <div class="price">¥9.9</div>
+                    <ul>
+                        <li>✅ 5轮对话</li>
+                        <li>✅ 基础选题评估</li>
+                        <li>✅ 简单提示词</li>
+                    </ul>
+                </div>
+                <div class="pricing-card">
+                    <h4>⚡ 标准版</h4>
+                    <div class="price">¥29.9</div>
+                    <ul>
+                        <li>✅ 20轮对话</li>
+                        <li>✅ 深度选题评估</li>
+                        <li>✅ 完整提示词包</li>
+                        <li>✅ 定价建议</li>
+                    </ul>
+                </div>
+                <div class="pricing-card">
+                    <h4>💎 年度会员</h4>
+                    <div class="price">¥99</div>
+                    <ul>
+                        <li>✅ 100轮对话</li>
+                        <li>✅ 全部功能</li>
+                        <li>✅ 优先客服</li>
+                        <li>✅ 新功能优先体验</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="contact-box">
+                <h3>🎁 新用户福利</h3>
+                <p>首次体验 <strong>免费 3 轮对话</strong></p>
+                <p>满意再付费！</p>
+                <p style="margin-top: 20px;">
+                    📞 联系微信：<strong>wengodgarden</strong>
+                </p>
+                <p>
+                    💬 或发送邮件至：<a href="mailto:wengodgarden@example.com">wengodgarden@example.com</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 简单的对话模拟（演示版）
+        const responses = {
+            default: `收到！我了解你在【专业领域】方面有丰富经验。
+
+让我们开始盘点你的知识资产：
+
+**第一步：明确核心能力**
+
+请回答以下 3 个问题：
+
+1️⃣ **你最擅长解决什么问题？**
+   （例如：帮企业做数字化转型、帮学生提高英语口语等）
+
+2️⃣ **你帮谁解决过这个问题？**
+   （例如：企业客户、学生、个人用户等）
+
+3️⃣ **你用什么方法解决？**
+   （例如：咨询框架、教学方法、工具模板等）
+
+💡 **提示**：回答越具体，我能给你的建议越精准！`,
+
+            product: `太好了！产品经理是一个非常适合做知识变现的领域。
+
+我见过很多产品经理成功变现，比如：
+• 某大厂PM开发了"需求分析AI助手"，月入2万+
+• 另一位开发了"产品面试模拟器"，单月卖出300份
+
+**你的机会点：**
+
+📋 **知识资产盘点清单：**
+1. 需求分析框架和方法论
+2. 用户调研技巧
+3. 产品设计工具（Figma/Axure）
+4. 项目管理经验
+5. 行业洞察和人脉资源
+
+💡 **最有价值的选题方向：**
+• AI产品经理转型课程
+• 需求分析AI Agent
+• 面试陪练机器人
+
+**下一步：请告诉我你最擅长的是哪个细分领域？**
+（例如：需求分析、用户增长、产品运营等）`,
+
+            english: `英语教学是一个非常有潜力的知识变现领域！
+
+**市场机会分析：**
+
+📊 **英语教育市场规模：**
+• 在线英语教育市场超过 500 亿
+• AI口语陪练需求暴涨 300%
+• 一对一课程单价 100-500元/小时
+
+**你的优势：**
+• ✅ 教学经验丰富
+• ✅ 了解学生痛点
+• ✅ 有课程体系
+
+**最佳变现路径：**
+
+🎯 **推荐选题：AI口语陪练 Agent**
+• 市场需求大
+• 可规模化
+• 单价可以定在 ¥49-199
+
+**你想做哪种类型的知识产品？**
+• A. 在线课程
+• B. AI Agent 工具
+• C. 1对1咨询
+• D. 其他想法`,
+
+            fitness: `健身教练是一个非常健康的知识变现领域！😄
+
+**行业数据：**
+• 在线健身市场增长率 40%
+• AI健身教练需求激增
+• 知识付费课程平均售价 ¥199-999
+
+**你的核心知识资产：**
+1. 健身动作库（可做视频课程）
+2. 饮食计划模板
+3. 训练周期规划
+4. 学员案例库
+5. 常见问题解答库
+
+**最佳变现方向：**
+
+🏆 **推荐：AI健身教练助手**
+• 功能：自动生成训练计划
+• 定价：¥49/月 或 ¥299/年
+• 目标用户：健身小白、减脂人群
+
+**你的学员主要是哪类人群？**
+• 减脂人群
+• 增肌人群
+• 产后恢复
+• 其他`,
+
+            help: `我是炼金师助手，专门帮你把经验变成钱！💰
+
+**我可以帮你：**
+
+📋 **知识资产盘点**
+• 系统梳理你的专业能力
+• 找出可变现的知识点
+
+💡 **选题价值评估**
+• 分析市场需求
+• 评估竞争情况
+• 预估变现潜力
+
+🤖 **AI Agent 提示词生成**
+• 生成可直接使用的提示词
+• 包含测试用例
+• 提供优化建议
+
+📦 **完整产出包**
+• Agent 提示词
+• 测试用例
+• 上架指南
+• 推广文案
+• 定价建议
+
+**现在请告诉我：你是什么职业？或者你最擅长什么？**`
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // 添加用户消息
+            chatMessages.innerHTML += `<div class="message user-message">${message}</div>`;
+            input.value = '';
+            
+            // 滚动到底部
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // 显示"正在输入"
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant-message';
+            typingDiv.innerHTML = '正在思考<span class="typing">...</span>';
+            typingDiv.id = 'typing';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // 模拟延迟回复
+            setTimeout(() => {
+                const typingElement = document.getElementById('typing');
+                if (typingElement) typingElement.remove();
+                
+                // 根据关键词选择回复
+                let response = responses.default;
+                
+                const lowerMsg = message.toLowerCase();
+                if (lowerMsg.includes('产品') || lowerMsg.includes('pm') || lowerMsg.includes('需求')) {
+                    response = responses.product;
+                } else if (lowerMsg.includes('英语') || lowerMsg.includes('教学') || lowerMsg.includes('老师')) {
+                    response = responses.english;
+                } else if (lowerMsg.includes('健身') || lowerMsg.includes('教练') || lowerMsg.includes('运动')) {
+                    response = responses.fitness;
+                } else if (lowerMsg.includes('帮助') || lowerMsg.includes('功能') || lowerMsg.includes('怎么用')) {
+                    response = responses.help;
+                } else {
+                    // 替换默认回复中的占位符
+                    response = response.replace('【专业领域】', message);
+                }
+                
+                chatMessages.innerHTML += `<div class="message assistant-message">${response.replace(/\n/g, '<br>')}</div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
